@@ -1,4 +1,3 @@
-import FastNoiseLite from 'fastnoise-lite';
 
 export class Modifier {
   apply(x, y, z, prevHeight, context) {
@@ -94,11 +93,13 @@ export default class HeightmapStack {
   }
 
   getHeight(x, y, z) {
+
+    const context = { ...this.context, prevHeight: 0 };
     let height = 0;
-    this.context.prevHeight = 0;
     for (const mod of this.modifiers) {
-      height = mod.apply(x, y, z, height, this.context);
-      this.context.prevHeight = height;
+      height = mod.apply(x, y, z, height, context);
+      context.prevHeight = height;
+
     }
     return height;
   }
