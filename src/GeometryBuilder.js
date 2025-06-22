@@ -14,9 +14,13 @@ function cubeFaceVector(face, u, v) {
 }
 
 export default class GeometryBuilder {
-  constructor(noiseGen, radius = 1) {
-    this.noiseGen = noiseGen;
+  constructor(heightStack, radius = 1) {
+    this.heightStack = heightStack;
     this.radius = radius;
+  }
+
+  getVertexHeight(x, y, z) {
+    return 1 + this.heightStack.getHeight(x, y, z);
   }
 
   buildFace(face, resolution = 16) {
@@ -28,7 +32,7 @@ export default class GeometryBuilder {
         const v = (y / resolution) * 2 - 1;
         const cube = cubeFaceVector(face, u, v);
         const sphere = cubeToSphere(cube);
-        const height = 1 + 0.1 * this.noiseGen.getElevation(sphere.x, sphere.y, sphere.z);
+        const height = this.getVertexHeight(sphere.x, sphere.y, sphere.z);
         vertices.push(sphere.x * this.radius * height,
                       sphere.y * this.radius * height,
                       sphere.z * this.radius * height);
