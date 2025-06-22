@@ -9,6 +9,10 @@ export default class FaceChunk {
     this.children = [];
   }
 
+  getVertexHeight(x, y, z) {
+    return this.builder.getVertexHeight(x, y, z);
+  }
+
   createMesh(material) {
     const geometry = this.builder.buildFace(this.face, this.resolution);
     const mat = material || new THREE.MeshStandardMaterial({
