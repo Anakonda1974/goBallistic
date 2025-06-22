@@ -19,10 +19,21 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 const planet = new PlanetManager(scene);
 
+const info = document.createElement('div');
+info.style.position = 'absolute';
+info.style.top = '0';
+info.style.left = '0';
+info.style.padding = '4px';
+info.style.color = 'white';
+info.style.background = 'rgba(0,0,0,0.5)';
+info.style.fontFamily = 'monospace';
+document.body.appendChild(info);
+
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
   planet.update(camera);
+  info.textContent = `Chunks: ${planet.chunks.length} | Modifiers: ${planet.heightStack.modifiers.length}`;
   renderer.render(scene, camera);
 }
 
