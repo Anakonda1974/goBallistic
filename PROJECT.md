@@ -48,8 +48,8 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
 - **FaceChunk** manages the geometry for a specific quadtree patch and handles LOD transitions.
 
 ### Terrain Generation
-- **NoiseGenerator** provides deterministic elevation values via seeded FastNoiseLite.
-- Optional GPU noise or warping can create more variety.
+- **HeightmapStack** combines modular modifiers (FBM noise, domain warp, terracing, etc.) using FastNoiseLite for deterministic results.
+- Each modifier can be toggled or extended for biome control and GPU-based implementations.
 
 ### Shader Structure
 - **TerrainShader** colors terrain based on height or biome data.
@@ -59,7 +59,7 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
 1. **Base Infrastructure**: Project setup with ES modules and Three.js rendering.
 2. **Cube-Sphere Geometry**: Implement GeometryBuilder with cube-to-sphere mapping.
 3. **Quadtree LOD**: Build FaceChunk and ChunkLODController to manage dynamic LOD.
-4. **Noise Integration**: Integrate FastNoiseLite for deterministic terrain heights.
+4. **Noise Integration**: Use HeightmapStack with FastNoiseLite-based modifiers for deterministic terrain heights.
 5. **Asynchronous Chunk Generation**: Offload heavy geometry builds using `requestIdleCallback` or Web Workers.
 6. **Shaders and Materials**: Provide extensible shader modules for terrain and water.
 7. **Optional Enhancements**: Support biomes, atmosphere scattering, water simulation, and export functionality.
