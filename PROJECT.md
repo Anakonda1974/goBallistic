@@ -27,7 +27,8 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
   PlanetManager.js - Coordinates cube faces and LOD updates
   FaceChunk.js     - Represents a chunk on a cube face
   GeometryBuilder.js - Produces sphere-mapped geometry
-  NoiseGenerator.js  - Seeded noise wrapper
+  HeightmapStack.js  - Modular noise modifiers
+  NoiseGenerator.js  - Seeded noise wrapper (legacy)
   ChunkLODController.js - Chooses LOD level based on camera distance
   materials/
     TerrainShader.js
