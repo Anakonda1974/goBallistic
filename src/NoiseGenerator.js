@@ -1,3 +1,5 @@
+// NOTE: This wrapper remains for backward compatibility. New features should
+// rely on HeightmapStack and its modifiers instead.
 import FastNoiseLite from 'fastnoise-lite';
 
 export default class NoiseGenerator {

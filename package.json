@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "test": "echo \"No tests\""
+    "test": "node test/deterministicHeight.js"
   },
   "dependencies": {
     "three": "^0.177.0",

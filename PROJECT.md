@@ -51,6 +51,11 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
 ### Terrain Generation
 - **HeightmapStack** combines modular modifiers (FBM noise, domain warp, terracing, etc.) using FastNoiseLite for deterministic results.
 - Each modifier can be toggled or extended for biome control and GPU-based implementations.
+- Screenshots illustrate the effect of each modifier:
+  - `FBMModifier` ![fbm](docs/screenshots/fbm.png)
+  - `DomainWarpModifier` ![domainwarp](docs/screenshots/domain-warp.png)
+  - `TerraceModifier` ![terrace](docs/screenshots/terrace.png)
+  - `CliffModifier` ![cliff](docs/screenshots/cliff.png)
 
 ### Shader Structure
 - **TerrainShader** colors terrain based on height or biome data.
@@ -67,7 +72,7 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
 
 ## Development and Testing
 - Start the demo with `npm start` and open `http://localhost:5173` in the browser.
-- Use `npm test` as a placeholder for automated tests (none yet).
+- Run `npm test` to verify deterministic height generation.
 - Keep code modular to make integration with bundlers like Vite or Webpack straightforward.
 
 ## Future Extensions

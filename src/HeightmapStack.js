@@ -81,6 +81,21 @@ export class CliffModifier extends Modifier {
   }
 }
 
+export class PlateauModifier extends Modifier {
+  constructor(threshold = 0.6, plateauFactor = 0.3) {
+    super();
+    this.threshold = threshold;
+    this.factor = plateauFactor;
+  }
+
+  apply(x, y, z, prevHeight) {
+    if (prevHeight > this.threshold) {
+      return this.threshold + (prevHeight - this.threshold) * this.factor;
+    }
+    return prevHeight;
+  }
+}
+
 export default class HeightmapStack {
   constructor(seed) {
     this.seed = seed;
