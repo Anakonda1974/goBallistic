@@ -1,0 +1,30 @@
+import * as THREE from 'three';
+
+export default class FaceChunk {
+  constructor(face, builder, resolution = 16) {
+    this.face = face;
+    this.builder = builder;
+    this.resolution = resolution;
+    this.mesh = null;
+    this.children = [];
+  }
+
+  createMesh(material) {
+    const geometry = this.builder.buildFace(this.face, this.resolution);
+    const mat = material || new THREE.MeshStandardMaterial({
+      color: 0x88aa55,
+      flatShading: true,
+    });
+    this.mesh = new THREE.Mesh(geometry, mat);
+    return this.mesh;
+  }
+
+  addToScene(scene) {
+    if (!this.mesh) this.createMesh();
+    scene.add(this.mesh);
+  }
+
+  update(camera) {
+    // LOD update placeholder
+  }
+}
