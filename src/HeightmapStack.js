@@ -1,3 +1,4 @@
+
 export class Modifier {
   apply(x, y, z, prevHeight, context) {
     return prevHeight;
@@ -92,11 +93,13 @@ export default class HeightmapStack {
   }
 
   getHeight(x, y, z) {
+
     const context = { ...this.context, prevHeight: 0 };
     let height = 0;
     for (const mod of this.modifiers) {
       height = mod.apply(x, y, z, height, context);
       context.prevHeight = height;
+
     }
     return height;
   }
