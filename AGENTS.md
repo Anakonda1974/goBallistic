@@ -32,7 +32,7 @@ This file lists outstanding tasks and opportunities for future improvements.
 
 The following items remain unfinished or have been identified as longer-term goals. Addressing them will push the project toward a more complete simulation.
 
-- [ ] **GPU heightmap pipeline** – the current GPU code path returns zero heights. Implement actual compute shaders or a GPU.js workflow and ensure tests validate parity with CPU results.
+ - [x] **GPU heightmap pipeline** – implemented compute shaders with a CPU fallback so GPU and CPU paths produce consistent results.
 - [ ] **Biome integration** – generate temperature and humidity maps, then blend layers based on those values to produce varied biomes.
 - [ ] **Atmospheric scattering** – add a shader-based atmosphere to enhance realism.
 - [ ] **Advanced water simulation** – extend `WaterShader` with wave dynamics and reflections.
