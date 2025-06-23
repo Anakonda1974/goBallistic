@@ -1,10 +1,8 @@
 import * as THREE from 'three';
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js';
+
 import FastNoiseLite from 'fastnoise-lite';
 
-// GPU height generator backed by GPUComputationRenderer when a WebGL
-// renderer is available. In non-browser tests it falls back to a CPU
-// implementation using FastNoiseLite so results remain deterministic.
 
 const noiseShader = `
 vec3 mod289(vec3 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -103,6 +101,7 @@ void main(){
   vec3 cube = cubeFaceVector(uFace, u, v);
   vec3 sphere = cubeToSphere(cube);
   float n = fbm(sphere * uFrequency + uSeed);
+
 gl_FragColor = vec4(n * uAmplitude, 0.0, 0.0, 1.0);
 }
 `;
@@ -196,10 +195,12 @@ export default class GPUHeightGenerator {
         buffer[(y * this.size + x) * 4] = h;
       }
     }
+
     return buffer;
   }
 
   getHeight(x, y, z) {
+
     const warp = this.noise.GetNoise(x, y, z) * this.params.warpIntensity;
     let wx = x + warp;
     let wy = y + warp;
@@ -213,5 +214,6 @@ export default class GPUHeightGenerator {
       amp *= 0.5;
     }
     return Math.max(-1, Math.min(1, value));
+
   }
 }
