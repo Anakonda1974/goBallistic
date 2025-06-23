@@ -53,10 +53,12 @@ export default class PlanetManager {
       }
       this.showDebug = false;
 
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 5, 5);
-    scene.add(light);
+    this.light = new THREE.DirectionalLight(0xffffff, 1);
+    this.light.position.set(5, 5, 5);
+    scene.add(this.light);
     scene.add(new THREE.AmbientLight(0x333333));
+    this.enableDayNight = false;
+    this.lightAngle = 0;
   }
 
   setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
@@ -104,8 +106,22 @@ export default class PlanetManager {
     }
   }
 
+  setDayNightCycleEnabled(enabled) {
+    this.enableDayNight = enabled;
+  }
+
   update(camera) {
     const frustum = getCameraFrustum(camera);
+    if (this.enableDayNight && this.light) {
+      this.lightAngle += 0.01;
+      const r = 5;
+      this.light.position.set(
+        Math.cos(this.lightAngle) * r,
+        Math.sin(this.lightAngle) * r,
+        5
+      );
+      this.light.lookAt(0, 0, 0);
+    }
     for (const chunk of this.chunks) {
       chunk.update(camera, this.lod, frustum);
     }

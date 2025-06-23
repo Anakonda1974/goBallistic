@@ -71,22 +71,26 @@ export default class LayerPipeline {
   }
 
   computeSlope(x, y, z, eps = 0.002) {
+
     // sample the terrain after tectonics are applied so rocky areas
     // correspond to the final elevation rather than base noise only
     const h = this.computeElevation(x, y, z);
     const hx = this.computeElevation(x + eps, y, z);
     const hy = this.computeElevation(x, y + eps, z);
     const hz = this.computeElevation(x, y, z + eps);
+
     const dx = (hx - h) / eps;
     const dy = (hy - h) / eps;
     const dz = (hz - h) / eps;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+
   }
 
   computeElevation(x, y, z) {
     const base = this.baseStack.getHeight(x, y, z);
     const tect = this.plateModifier.apply(x, y, z, base);
     return Math.max(-1, Math.min(1, tect));
+
   }
 
   addLayer(id, fn, enabled = true) {
