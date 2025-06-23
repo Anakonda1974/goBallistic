@@ -56,6 +56,9 @@ for realistic geometry. The main layers are:
 
 Adjusting these layers in the UI or code allows experimentation while keeping
 terrain generation stable.
+You can also measure how much a single layer contributes to the final height
+with `pipeline.getLayerInfluence(id, x, y, z)`. See
+[`docs/LayerInfluence.md`](docs/LayerInfluence.md) for details.
 
 ### Customizing Tectonic Plates
 
