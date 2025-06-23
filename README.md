@@ -16,7 +16,7 @@ This project demonstrates a procedural planet generated with a quadtree level of
 
 ## Usage
 
-Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar in the UI now updates in real time while geometry is built in Web Workers. Tests can be run with:
+Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar in the UI now updates in real time while geometry is built in Web Workers. Status messages below the bar show the current subtask in the format `Rebuild -> face (50%)`. Tests can be run with:
 
 ```bash
 npm test
@@ -31,7 +31,7 @@ See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future pl
 ## Terrain Layers
 
 The `LayerPipeline` combines several modifiers to create the final heightmap. Layers
-are evaluated in order and clamped so the resulting heights remain within `[-1, 1]`
+are evaluated sequentially in a fixed hierarchy and clamped so the resulting heights remain within `[-1, 1]`
 for realistic geometry. The main layers are:
 
 1. **baseNoise** – domain‑warped fractal noise defining large-scale features.
