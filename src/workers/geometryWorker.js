@@ -2,7 +2,7 @@ import GeometryBuilder from '../GeometryBuilder.js';
 import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, PlateauModifier, CliffModifier } from '../HeightmapStack.js';
 import FastNoiseLite from 'fastnoise-lite';
 
-self.onmessage = (e) => {
+self.onmessage = async (e) => {
   const { face, resolution, radius, seed } = e.data;
   const fnl = new FastNoiseLite(seed);
   fnl.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
@@ -12,10 +12,11 @@ self.onmessage = (e) => {
   stack.add(new TerraceModifier(8, 0.8));
   stack.add(new PlateauModifier(0.5, 0.3));
   const builder = new GeometryBuilder(stack, radius);
-  const geom = builder.buildFace(face, resolution);
+  const progressCallback = (p) => self.postMessage({ progress: p });
+  const geom = await builder.buildFaceAsync(face, resolution, progressCallback);
   const data = {
     position: geom.getAttribute('position').array,
-    index: geom.getIndex().array
+    index: geom.getIndex().array,
   };
-  self.postMessage(data, [data.position.buffer, data.index.buffer]);
+  self.postMessage({ done: true, ...data }, [data.position.buffer, data.index.buffer]);
 };

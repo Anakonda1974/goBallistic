@@ -8,5 +8,5 @@ This file lists outstanding tasks and opportunities for future improvements.
 - [x] Explore using Web Workers for asynchronous chunk generation.
 
 ## New Tasks
-- [ ] Replace placeholder screenshots with actual captures from the demo.
-- [ ] Improve progress reporting when geometry is generated in Web Workers.
+- [x] Replace placeholder screenshots with actual captures from the demo.
+- [x] Improve progress reporting when geometry is generated in Web Workers.
