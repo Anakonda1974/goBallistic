@@ -34,3 +34,4 @@ import './plateTectonics.js';
 import './rockyLayer.js';
 import './gpuHeight.js';
 import './plateModifier.js';
+import './exportTools.js';
