@@ -6,6 +6,7 @@ import createTerrainMaterial from './materials/TerrainShader.js';
 import createWaterMaterial from './materials/WaterShader.js';
 import LayerPipeline from './LayerPipeline.js';
 import PlateDebugView from './PlateDebugView.js';
+import LayerDebugView from './LayerDebugView.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
@@ -22,6 +23,7 @@ export default class PlanetManager {
       this.pipeline = new LayerPipeline(seed);
       this.heightStack = this.pipeline;
       this.debugView = new PlateDebugView(this.pipeline.plates, radius);
+      this.layerView = new LayerDebugView(this.pipeline, 'baseNoise', radius);
     }
 
     this.builder = new GeometryBuilder(this.heightStack, radius);
@@ -50,6 +52,10 @@ export default class PlanetManager {
       if (this.debugView) {
         this.debugView.addToScene(scene);
         this.debugView.group.visible = false;
+      }
+      if (this.layerView) {
+        this.layerView.addToScene(scene);
+        this.layerView.group.visible = false;
       }
       this.showDebug = false;
 
@@ -108,12 +114,29 @@ export default class PlanetManager {
 
     if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
 
+    this.updateLayerDebug();
+
   }
 
   setDebugVisible(visible) {
     this.showDebug = visible;
     if (this.debugView) {
       this.debugView.group.visible = visible;
+    }
+    if (this.layerView) {
+      this.layerView.group.visible = visible;
+    }
+  }
+
+  setDebugLayer(id) {
+    if (this.layerView) {
+      this.layerView.setLayer(id);
+    }
+  }
+
+  updateLayerDebug() {
+    if (this.layerView && this.layerView.group.visible) {
+      this.layerView.update();
     }
   }
 
