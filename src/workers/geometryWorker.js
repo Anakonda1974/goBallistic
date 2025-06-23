@@ -12,7 +12,7 @@ self.onmessage = async (e) => {
   stack.add(new TerraceModifier(8, 0.8));
   stack.add(new PlateauModifier(0.5, 0.3));
   const builder = new GeometryBuilder(stack, radius);
-  const progressCallback = (p) => self.postMessage({ progress: p });
+  const progressCallback = (p) => self.postMessage({ progress: p, face });
   const geom = await builder.buildFaceAsync(face, resolution, progressCallback);
   const data = {
     position: geom.getAttribute('position').array,

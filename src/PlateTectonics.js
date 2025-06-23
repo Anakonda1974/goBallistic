@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import Plate from './Plate.js';
 
 function mulberry32(a) {
   return function() {
@@ -30,7 +31,7 @@ export default class PlateTectonics {
     for (let i = 0; i < plateCount; i++) {
       const center = randomPointOnSphere(this.rand);
       const vector = randomTangent(center, this.rand);
-      this.plates.push({ id: i, center, vector, type: 'oceanic' });
+      this.plates.push(new Plate(i, center, vector));
     }
   }
 

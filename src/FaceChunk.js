@@ -90,7 +90,7 @@ export default class FaceChunk {
         const data = await new Promise((resolve) => {
           this.worker.onmessage = (e) => {
             if (e.data.progress !== undefined) {
-              if (progressCallback) progressCallback(e.data.progress);
+              if (e.data.face === this.face && progressCallback) progressCallback(e.data.progress);
             } else {
               resolve(e.data);
             }

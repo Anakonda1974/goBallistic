@@ -8,6 +8,7 @@ import createWaterMaterial from './materials/WaterShader.js';
 import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, CliffModifier, PlateauModifier } from './HeightmapStack.js';
 import PlateTectonics from './PlateTectonics.js';
 import PlateModifier from './PlateModifier.js';
+import PlateDebugView from './PlateDebugView.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
@@ -36,6 +37,7 @@ export default class PlanetManager {
 
       this.plates = new PlateTectonics(seed, 20, 0.1);
       this.plateModifier = new PlateModifier(this.plates, 0.05);
+      this.debugView = new PlateDebugView(this.plates, radius);
 
       this.modifiers = [this.domainWarp, this.fbm, this.terrace, this.plateau, this.plateModifier];
       for (const m of this.modifiers) this.heightStack.add(m);
@@ -69,6 +71,9 @@ export default class PlanetManager {
       createWaterMaterial({ envMap: scene.environment || null })
     );
     scene.add(this.water);
+    this.debugView.addToScene(scene);
+    this.debugView.group.visible = false;
+    this.showDebug = false;
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 5, 5);
@@ -159,6 +164,11 @@ export default class PlanetManager {
       update(i, 1);
       await new Promise((r) => requestAnimationFrame(r));
     }
+  }
+
+  setDebugVisible(visible) {
+    this.showDebug = visible;
+    this.debugView.group.visible = visible;
   }
 
   update(camera) {
