@@ -15,8 +15,10 @@ export default class PlanetManager {
     fnl.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 
     this.heightStack = new HeightmapStack(seed);
-    this.heightStack.add(new DomainWarpModifier(fnl, 0.2));
-    this.heightStack.add(new FBMModifier(fnl, 1.0, 1.2, 5));
+    this.domainWarp = new DomainWarpModifier(fnl, 0.2);
+    this.fbm = new FBMModifier(fnl, 1.0, 1.2, 5);
+    this.heightStack.add(this.domainWarp);
+    this.heightStack.add(this.fbm);
     this.heightStack.add(new TerraceModifier(8, 0.8));
     // this.heightStack.add(new CliffModifier(0.25, 2.2));
 
@@ -36,6 +38,21 @@ export default class PlanetManager {
     light.position.set(5, 5, 5);
     scene.add(light);
     scene.add(new THREE.AmbientLight(0x333333));
+  }
+
+  setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
+    if (amplitude !== undefined) this.fbm.amplitude = amplitude;
+    if (frequency !== undefined) this.fbm.frequency = frequency;
+    if (octaves !== undefined) this.fbm.octaves = octaves;
+    if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
+  }
+
+  async rebuild(progressCallback) {
+    for (let i = 0; i < this.chunks.length; i++) {
+      this.chunks[i].rebuild();
+      if (progressCallback) progressCallback((i + 1) / this.chunks.length);
+      await new Promise(requestAnimationFrame);
+    }
   }
 
   update(camera) {
