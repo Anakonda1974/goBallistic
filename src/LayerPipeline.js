@@ -72,16 +72,17 @@ export default class LayerPipeline {
 
   computeSlope(x, y, z, eps = 0.002) {
 
-    // sample the terrain after tectonics are applied so rocky areas
-    // correspond to the final elevation rather than base noise only
-    const h = this.computeElevation(x, y, z);
-    const hx = this.computeElevation(x + eps, y, z);
-    const hy = this.computeElevation(x, y + eps, z);
-    const hz = this.computeElevation(x, y, z + eps);
-
-    const dx = (hx - h) / eps;
-    const dy = (hy - h) / eps;
-    const dz = (hz - h) / eps;
+    // Sample the fully modified terrain so rocky areas align with the final
+    // elevation. Use central differences for a more stable gradient.
+    const hx1 = this.computeElevation(x + eps, y, z);
+    const hx2 = this.computeElevation(x - eps, y, z);
+    const hy1 = this.computeElevation(x, y + eps, z);
+    const hy2 = this.computeElevation(x, y - eps, z);
+    const hz1 = this.computeElevation(x, y, z + eps);
+    const hz2 = this.computeElevation(x, y, z - eps);
+    const dx = (hx1 - hx2) / (2 * eps);
+    const dy = (hy1 - hy2) / (2 * eps);
+    const dz = (hz1 - hz2) / (2 * eps);
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 
   }

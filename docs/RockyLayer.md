@@ -10,3 +10,8 @@ look.
 
 Use the "Cliff Threshold" and "Cliff Boost" sliders in the UI to adjust these
 values interactively.
+
+
+Slope values are derived using central differences of the final elevation so
+cliff detection corresponds to the fully deformed terrain.
+
