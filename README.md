@@ -24,7 +24,7 @@ npm run build
 
 Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar updates in real time while geometry is built in Web Workers. Chunks rebuild in parallel for faster feedback. Status messages below the bar show the current subtask in the format `Rebuild -> face (50%)`.
 
-When a WebGL2 renderer is available, you can set `useGPU` to `true` to enable compute shader based height generation. This mode currently only provides the base noise layer, so the layer checkboxes in the UI will have no effect. The demo defaults to CPU generation so that all layers can be toggled.
+When a WebGL2 renderer is available, you can set `useGPU` to `true` to enable compute shader based height generation. The shader now supports the domain warp intensity parameter so GPU and CPU paths yield similar terrain. The demo defaults to CPU generation so that all layers can be toggled.
 
 Tests can be run with:
 

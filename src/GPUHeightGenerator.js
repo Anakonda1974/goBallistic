@@ -76,6 +76,7 @@ const computeFragment = `
 uniform float uFrequency;
 uniform float uAmplitude;
 uniform float uSeed;
+uniform float uWarpIntensity;
 uniform int uFace;
 
 ${noiseShader}
@@ -104,7 +105,9 @@ void main(){
   float v = uv.y*2.0 - 1.0;
   vec3 cube = cubeFaceVector(uFace, u, v);
   vec3 sphere = cubeToSphere(cube);
-  float n = fbm(sphere * uFrequency + uSeed);
+  float warp = snoise(sphere + uSeed) * uWarpIntensity;
+  vec3 warped = sphere + vec3(warp);
+  float n = fbm(warped * uFrequency + uSeed);
 
 gl_FragColor = vec4(n * uAmplitude, 0.0, 0.0, 1.0);
 }
@@ -156,6 +159,7 @@ export default class GPUHeightGenerator {
       this.variable.material.uniforms.uFrequency = { value: 1.0 };
       this.variable.material.uniforms.uAmplitude = { value: 1.0 };
       this.variable.material.uniforms.uSeed = { value: 0.0 };
+      this.variable.material.uniforms.uWarpIntensity = { value: 0.2 };
       this.variable.material.uniforms.uFace = { value: 0 };
       this.gpu.setVariableDependencies(this.variable, [this.variable]);
       const err = this.gpu.init();
@@ -177,6 +181,7 @@ export default class GPUHeightGenerator {
       this.variable.material.uniforms.uFrequency.value = freq;
       this.variable.material.uniforms.uAmplitude.value = amp;
       this.variable.material.uniforms.uSeed.value = seed;
+      this.variable.material.uniforms.uWarpIntensity.value = this.params.warpIntensity;
       this.gpu.compute();
       const target = this.gpu.getCurrentRenderTarget(this.variable);
       const buffer = new Float32Array(this.size * this.size * 4);
