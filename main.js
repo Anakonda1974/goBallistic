@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import PlanetManager from '/src/PlanetManager.js';
+// Use a relative path so loading index.html directly works without a dev server
+import PlanetManager from './src/PlanetManager.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);

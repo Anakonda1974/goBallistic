@@ -12,6 +12,9 @@ npm start
 ```
 
 The app will be available at `http://localhost:5173`.
+You can also open `index.html` directly from the filesystem as the main script
+now uses a relative path, but running the dev server is recommended for hot
+reloading and module resolution.
 
 To produce an optimized build run:
 
