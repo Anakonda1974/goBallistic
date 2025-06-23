@@ -80,7 +80,7 @@ export default class PlanetManager {
     if (this.pipeline) this.pipeline.setEnabled(id, enabled);
   }
 
-  async rebuild(progressCallback) {
+  async rebuild(progressCallback, statusCallback) {
     const total = this.chunks.length;
     const progress = new Array(total).fill(0);
 
@@ -92,11 +92,18 @@ export default class PlanetManager {
       }
     };
 
+    if (statusCallback) statusCallback('Starting rebuild');
+
     for (let i = 0; i < total; i++) {
-      await this.chunks[i].rebuildAsync((p) => update(i, p));
+      const chunk = this.chunks[i];
+      if (statusCallback) statusCallback(`Building ${chunk.face}`);
+      await chunk.rebuildAsync((p) => update(i, p));
       update(i, 1);
+      if (statusCallback) statusCallback(`Finished ${chunk.face}`);
       await new Promise((r) => requestAnimationFrame(r));
     }
+
+    if (statusCallback) statusCallback('Rebuild complete');
   }
 
   setDebugVisible(visible) {
