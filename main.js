@@ -17,7 +17,7 @@ camera.position.set(0, 3, 6);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-const planet = new PlanetManager(scene, 1, true, true);
+const planet = new PlanetManager(scene, 1, true, true, renderer);
 
 const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
