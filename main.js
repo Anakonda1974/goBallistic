@@ -37,6 +37,7 @@ const cloudFlowCheck = document.getElementById('cloudFlowCheck');
 const rockyCheck = document.getElementById('rockyCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
+const statusDiv = document.getElementById('status');
 
 function updateParams() {
   planet.setNoiseParams({
@@ -66,9 +67,16 @@ async function triggerRebuild() {
   rebuilding = true;
   updateParams();
   progressBar.style.width = '0%';
-  await planet.rebuild(p => {
-    progressBar.style.width = `${p * 100}%`;
-  });
+  statusDiv.textContent = 'Starting rebuild...';
+  await planet.rebuild(
+    p => {
+      progressBar.style.width = `${p * 100}%`;
+    },
+    msg => {
+      statusDiv.textContent = msg;
+    }
+  );
+  statusDiv.textContent = 'Idle';
   rebuilding = false;
 }
 
