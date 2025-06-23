@@ -25,6 +25,9 @@ const octaves = document.getElementById('octaves');
 const warp = document.getElementById('warp');
 const terraceSteps = document.getElementById('terraceSteps');
 const terraceRange = document.getElementById('terraceRange');
+const plateauCheck = document.getElementById('plateauCheck');
+const plateauThreshold = document.getElementById('plateauThreshold');
+const plateauFactor = document.getElementById('plateauFactor');
 const domainWarpCheck = document.getElementById('domainWarpCheck');
 const terraceCheck = document.getElementById('terraceCheck');
 const cliffCheck = document.getElementById('cliffCheck');
@@ -38,10 +41,13 @@ function updateParams() {
     octaves: parseInt(octaves.value, 10),
     warpIntensity: parseFloat(warp.value),
     terraceSteps: parseInt(terraceSteps.value, 10),
-    terraceRange: parseFloat(terraceRange.value)
+    terraceRange: parseFloat(terraceRange.value),
+    plateauThreshold: parseFloat(plateauThreshold.value),
+    plateauFactor: parseFloat(plateauFactor.value)
   });
   planet.setModifierEnabled('domainWarp', domainWarpCheck.checked);
   planet.setModifierEnabled('terrace', terraceCheck.checked);
+  planet.setModifierEnabled('plateau', plateauCheck.checked);
   planet.setModifierEnabled('cliff', cliffCheck.checked);
 }
 
@@ -60,7 +66,8 @@ async function triggerRebuild() {
 rebuildBtn.addEventListener('click', triggerRebuild);
 [amp, freq, octaves, warp,
   terraceSteps, terraceRange,
-  domainWarpCheck, terraceCheck, cliffCheck
+  plateauThreshold, plateauFactor,
+  domainWarpCheck, terraceCheck, plateauCheck, cliffCheck
 ].forEach(input => {
   input.addEventListener('input', triggerRebuild);
   if (input.type === 'checkbox') {
