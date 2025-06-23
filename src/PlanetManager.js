@@ -1,48 +1,36 @@
 import * as THREE from 'three';
-import FastNoiseLite from 'fastnoise-lite';
 import GeometryBuilder from './GeometryBuilder.js';
 import FaceChunk from './FaceChunk.js';
 import ChunkLODController from './ChunkLODController.js';
 import createTerrainMaterial from './materials/TerrainShader.js';
 import createWaterMaterial from './materials/WaterShader.js';
-import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, CliffModifier, PlateauModifier } from './HeightmapStack.js';
-import PlateTectonics from './PlateTectonics.js';
-import PlateModifier from './PlateModifier.js';
+import LayerPipeline from './LayerPipeline.js';
+import PlateDebugView from './PlateDebugView.js';
+import LayerDebugView from './LayerDebugView.js';
+import GPUHeightGenerator from './GPUHeightGenerator.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
-  constructor(scene, radius = 1, useGPU = true) {
+  constructor(scene, radius = 1, useGPU = true, useWorker = false, renderer = null) {
     this.scene = scene;
     this.useGPU = useGPU;
+    this.useWorker = useWorker;
+    this.renderer = renderer;
 
     const seed = 1234;
     this.seed = seed;
-    let fnl;
-    if (!this.useGPU) {
-      fnl = new FastNoiseLite(seed);
-      fnl.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-    }
-
     if (this.useGPU) {
-      this.heightStack = { getHeight() { return 0; } };
+      if (this.renderer) {
+        this.gpuHeight = new GPUHeightGenerator(this.renderer, 33);
+        this.heightStack = this.gpuHeight;
+      } else {
+        this.heightStack = { getHeight() { return 0; } };
+      }
     } else {
-      this.heightStack = new HeightmapStack(seed);
-      this.domainWarp = new DomainWarpModifier(fnl, 0.2);
-      this.fbm = new FBMModifier(fnl, 1.0, 1.2, 5);
-      this.terrace = new TerraceModifier(8, 0.8);
-      this.plateau = new PlateauModifier(0.5, 0.3);
-      this.cliff = new CliffModifier(0.25, 2.2);
-
-      this.plates = new PlateTectonics(seed, 20, 0.1);
-      this.plateModifier = new PlateModifier(this.plates, 0.05);
-
-      this.modifiers = [this.domainWarp, this.fbm, this.terrace, this.plateau, this.plateModifier];
-      for (const m of this.modifiers) this.heightStack.add(m);
-
-      this.useDomainWarp = true;
-      this.useTerrace = true;
-      this.usePlateau = false;
-      this.useCliff = false;
+      this.pipeline = new LayerPipeline(seed);
+      this.heightStack = this.pipeline;
+      this.debugView = new PlateDebugView(this.pipeline.plates, radius);
+      this.layerView = new LayerDebugView(this.pipeline, 'baseNoise', radius);
     }
 
     this.builder = new GeometryBuilder(this.heightStack, radius);
@@ -57,100 +45,124 @@ export default class PlanetManager {
 
     const faces = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     for (const face of faces) {
-      const chunk = new FaceChunk(face, this.builder, 32);
+      const chunk = new FaceChunk(face, this.builder, 32, this.useWorker);
       chunk.createMesh(this.terrainMaterial);
       chunk.addToScene(scene);
       this.chunks.push(chunk);
     }
 
-    this.water = new THREE.Mesh(
-      new THREE.SphereGeometry(radius * 0.99, 32, 32),
-      createWaterMaterial({ envMap: scene.environment || null })
-    );
-    scene.add(this.water);
+      this.water = new THREE.Mesh(
+        new THREE.SphereGeometry(radius * 0.99, 32, 32),
+        createWaterMaterial({ envMap: scene.environment || null })
+      );
+      scene.add(this.water);
+      if (this.debugView) {
+        this.debugView.addToScene(scene);
+        this.debugView.group.visible = false;
+      }
+      if (this.layerView) {
+        this.layerView.addToScene(scene);
+        this.layerView.group.visible = false;
+      }
+      this.showDebug = false;
 
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 5, 5);
-    scene.add(light);
+    this.light = new THREE.DirectionalLight(0xffffff, 1);
+    this.light.position.set(5, 5, 5);
+    scene.add(this.light);
     scene.add(new THREE.AmbientLight(0x333333));
+    this.enableDayNight = false;
+    this.lightAngle = 0;
   }
 
-  setNoiseParams({
-    amplitude,
-    frequency,
-    octaves,
-    warpIntensity,
-    terraceSteps,
-    terraceRange,
-    plateauThreshold,
-    plateauFactor,
-  }) {
+  setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
     if (this.useGPU) {
       if (amplitude !== undefined) this.terrainMaterial.uniforms.uAmplitude.value = amplitude;
       if (frequency !== undefined) this.terrainMaterial.uniforms.uFrequency.value = frequency;
-    } else {
-      if (amplitude !== undefined) this.fbm.amplitude = amplitude;
-      if (frequency !== undefined) this.fbm.frequency = frequency;
-      if (octaves !== undefined) this.fbm.octaves = octaves;
-      if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
-      if (terraceSteps !== undefined) this.terrace.steps = terraceSteps;
-      if (terraceRange !== undefined) this.terrace.heightRange = terraceRange;
-      if (plateauThreshold !== undefined) this.plateau.threshold = plateauThreshold;
-      if (plateauFactor !== undefined) this.plateau.factor = plateauFactor;
+    } else if (this.pipeline) {
+      this.pipeline.setBaseNoiseParams({ amplitude, frequency, octaves, warpIntensity });
     }
   }
 
-  setModifierEnabled(name, enabled) {
-    switch (name) {
-      case 'domainWarp':
-        this.useDomainWarp = enabled;
-        this._toggleModifier(this.domainWarp, enabled);
-        break;
-      case 'terrace':
-        this.useTerrace = enabled;
-        this._toggleModifier(this.terrace, enabled);
-        break;
-      case 'cliff':
-        this.useCliff = enabled;
-        this._toggleModifier(this.cliff, enabled);
-        break;
-      case 'plateau':
-        this.usePlateau = enabled;
-        this._toggleModifier(this.plateau, enabled);
-        break;
+  setCliffParams({ threshold, boost }) {
+    if (this.pipeline) {
+      this.pipeline.setCliffParams({ threshold, boost });
     }
   }
 
-  _toggleModifier(mod, enabled) {
-    if (this.useGPU) return;
-
-    const hasMod = this.heightStack.modifiers.includes(mod);
-    if (enabled && !hasMod) {
-      this.heightStack.modifiers.push(mod);
-    } else if (!enabled && hasMod) {
-      this.heightStack.modifiers = this.heightStack.modifiers.filter(m => m !== mod);
-    }
-    // Re-order modifiers to maintain consistent stack
-    const ordered = [];
-    if (this.useDomainWarp) ordered.push(this.domainWarp);
-    ordered.push(this.fbm);
-    if (this.useTerrace) ordered.push(this.terrace);
-    if (this.usePlateau) ordered.push(this.plateau);
-    if (this.useCliff) ordered.push(this.cliff);
-    ordered.push(this.plateModifier);
-    this.heightStack.modifiers = ordered;
+  setLayerEnabled(id, enabled) {
+    if (this.pipeline) this.pipeline.setEnabled(id, enabled);
   }
 
-  async rebuild(progressCallback) {
-    for (let i = 0; i < this.chunks.length; i++) {
-      await this.chunks[i].rebuildAsync();
-      if (progressCallback) progressCallback((i + 1) / this.chunks.length);
+  async rebuild(progressCallback, statusCallback) {
+    const total = this.chunks.length;
+    const progress = new Array(total).fill(0);
+
+    const update = (idx, p) => {
+      progress[idx] = p;
+      if (progressCallback) {
+        const sum = progress.reduce((a, b) => a + b, 0);
+        progressCallback(sum / total);
+      }
+    };
+
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
+
+    for (let i = 0; i < total; i++) {
+      const chunk = this.chunks[i];
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: i / total });
+      await chunk.rebuildAsync((p) => {
+        update(i, p);
+        if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: (i + p) / total });
+      });
+      update(i, 1);
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: (i + 1) / total });
       await new Promise((r) => requestAnimationFrame(r));
     }
+
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+
+    this.updateLayerDebug();
+
+  }
+
+  setDebugVisible(visible) {
+    this.showDebug = visible;
+    if (this.debugView) {
+      this.debugView.group.visible = visible;
+    }
+    if (this.layerView) {
+      this.layerView.group.visible = visible;
+    }
+  }
+
+  setDebugLayer(id) {
+    if (this.layerView) {
+      this.layerView.setLayer(id);
+    }
+  }
+
+  updateLayerDebug() {
+    if (this.layerView && this.layerView.group.visible) {
+      this.layerView.update();
+    }
+  }
+
+  setDayNightCycleEnabled(enabled) {
+    this.enableDayNight = enabled;
   }
 
   update(camera) {
     const frustum = getCameraFrustum(camera);
+    if (this.enableDayNight && this.light) {
+      this.lightAngle += 0.01;
+      const r = 5;
+      this.light.position.set(
+        Math.cos(this.lightAngle) * r,
+        Math.sin(this.lightAngle) * r,
+        5
+      );
+      this.light.lookAt(0, 0, 0);
+    }
     for (const chunk of this.chunks) {
       chunk.update(camera, this.lod, frustum);
     }

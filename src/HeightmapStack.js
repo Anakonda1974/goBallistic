@@ -110,14 +110,14 @@ export default class HeightmapStack {
   }
 
   getHeight(x, y, z) {
-
     const context = { ...this.context };
     let height = 0;
     for (const mod of this.modifiers) {
       context.prevHeight = height;
       height = mod.apply(x, y, z, height, context);
-
     }
-    return height;
+    // Clamp to a sane range so later layers receive meaningful values
+    // and geometry does not collapse or explode.
+    return Math.max(-1, Math.min(1, height));
   }
 }
