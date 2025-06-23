@@ -32,3 +32,4 @@ console.log('Deterministic heightmap test passed.');
 import './frustumUtils.js';
 import './plateTectonics.js';
 import './rockyLayer.js';
+import './gpuHeight.js';

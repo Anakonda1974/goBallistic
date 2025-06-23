@@ -21,7 +21,9 @@ export default class PlanetManager {
     this.seed = seed;
     if (this.useGPU) {
       if (this.renderer) {
-        this.gpuHeight = new GPUHeightGenerator(this.renderer, 33);
+
+        this.gpuHeight = new GPUHeightGenerator(this.renderer, 33, seed);
+
         this.heightStack = this.gpuHeight;
       } else {
         this.heightStack = { getHeight() { return 0; } };
@@ -78,6 +80,9 @@ export default class PlanetManager {
     if (this.useGPU) {
       if (amplitude !== undefined) this.terrainMaterial.uniforms.uAmplitude.value = amplitude;
       if (frequency !== undefined) this.terrainMaterial.uniforms.uFrequency.value = frequency;
+      if (this.gpuHeight) {
+        this.gpuHeight.setParams({ amplitude, frequency, octaves, warpIntensity });
+      }
     } else if (this.pipeline) {
       this.pipeline.setBaseNoiseParams({ amplitude, frequency, octaves, warpIntensity });
     }
