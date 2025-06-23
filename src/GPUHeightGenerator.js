@@ -3,6 +3,10 @@ import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRe
 
 import FastNoiseLite from 'fastnoise-lite';
 
+// GPU height generator backed by GPUComputationRenderer when a WebGL
+// renderer is available. In non-browser tests it falls back to a CPU
+// implementation using FastNoiseLite so results remain deterministic.
+
 
 const noiseShader = `
 vec3 mod289(vec3 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}

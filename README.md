@@ -26,7 +26,9 @@ npm test
 
 The demo also includes a basic day/night cycle with the main light orbiting the planet.
 
+
 Additional controls let you scale the entire planet and toggle on-screen rulers (grid and axes) for reference.
+
 
 ## Documentation
 
