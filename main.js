@@ -24,6 +24,8 @@ const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
 const octaves = document.getElementById('octaves');
 const warp = document.getElementById('warp');
+const cliffThreshold = document.getElementById('cliffThreshold');
+const cliffBoost = document.getElementById('cliffBoost');
 const baseNoiseCheck = document.getElementById('baseNoiseCheck');
 const tectonicsCheck = document.getElementById('tectonicsCheck');
 const moistureCheck = document.getElementById('moistureCheck');
@@ -32,6 +34,7 @@ const biomeCheck = document.getElementById('biomeCheck');
 const vegetationCheck = document.getElementById('vegetationCheck');
 const cloudDensityCheck = document.getElementById('cloudDensityCheck');
 const cloudFlowCheck = document.getElementById('cloudFlowCheck');
+const rockyCheck = document.getElementById('rockyCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
 
@@ -42,6 +45,10 @@ function updateParams() {
     octaves: parseInt(octaves.value, 10),
     warpIntensity: parseFloat(warp.value)
   });
+  planet.setCliffParams({
+    threshold: parseFloat(cliffThreshold.value),
+    boost: parseFloat(cliffBoost.value)
+  });
   planet.setLayerEnabled('baseNoise', baseNoiseCheck.checked);
   planet.setLayerEnabled('tectonics', tectonicsCheck.checked);
   planet.setLayerEnabled('moisture', moistureCheck.checked);
@@ -50,6 +57,7 @@ function updateParams() {
   planet.setLayerEnabled('vegetation', vegetationCheck.checked);
   planet.setLayerEnabled('cloudDensity', cloudDensityCheck.checked);
   planet.setLayerEnabled('cloudFlow', cloudFlowCheck.checked);
+  planet.setLayerEnabled('rocky', rockyCheck.checked);
 }
 
 let rebuilding = false;
@@ -66,8 +74,10 @@ async function triggerRebuild() {
 
 rebuildBtn.addEventListener('click', triggerRebuild);
 [amp, freq, octaves, warp,
+  cliffThreshold, cliffBoost,
   baseNoiseCheck, tectonicsCheck, moistureCheck, temperatureCheck,
-  biomeCheck, vegetationCheck, cloudDensityCheck, cloudFlowCheck
+  biomeCheck, vegetationCheck, cloudDensityCheck, cloudFlowCheck,
+  rockyCheck
 ].forEach(input => {
   input.addEventListener('input', triggerRebuild);
   if (input.type === 'checkbox') {

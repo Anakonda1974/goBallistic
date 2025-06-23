@@ -27,6 +27,8 @@ export default class LayerPipeline {
     this.baseStack.add(this.domainWarp);
     this.baseStack.add(this.fbm);
 
+    this.cliffParams = { threshold: 0.3, boost: 2.0 };
+
     // tectonics
     this.plates = new PlateTectonics(seed, 20, 0.1);
     this.plateModifier = new PlateModifier(this.plates, 0.05);
@@ -57,6 +59,26 @@ export default class LayerPipeline {
     this.addLayer('vegetation', (x, y, z, ctx) => (ctx.moisture ?? 0) * 0.5 + 0.5);
     this.addLayer('cloudDensity', (x, y, z, ctx) => (ctx.moisture ?? 0) * (1 - Math.abs(ctx.temperature ?? 0)));
     this.addLayer('cloudFlow', (x, y, z) => ({ x: fnl.GetNoise(x, 0, 0), y: 0, z: fnl.GetNoise(0, 0, z) }));
+    this.addLayer('rocky', (x, y, z, ctx) => {
+      const h = ctx.elevation ?? 0;
+      const slope = this.computeSlope(x, y, z);
+      if (slope > this.cliffParams.threshold) {
+        const boosted = h * this.cliffParams.boost;
+        return Math.max(-1, Math.min(1, boosted));
+      }
+      return h;
+    });
+  }
+
+  computeSlope(x, y, z, eps = 0.002) {
+    const h = this.baseStack.getHeight(x, y, z);
+    const hx = this.baseStack.getHeight(x + eps, y, z);
+    const hy = this.baseStack.getHeight(x, y + eps, z);
+    const hz = this.baseStack.getHeight(x, y, z + eps);
+    const dx = (hx - h) / eps;
+    const dy = (hy - h) / eps;
+    const dz = (hz - h) / eps;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   addLayer(id, fn, enabled = true) {
@@ -75,6 +97,11 @@ export default class LayerPipeline {
     if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
   }
 
+  setCliffParams({ threshold, boost }) {
+    if (threshold !== undefined) this.cliffParams.threshold = threshold;
+    if (boost !== undefined) this.cliffParams.boost = boost;
+  }
+
   compute(x, y, z) {
     const context = {};
     for (const layer of this.layers) {
@@ -87,6 +114,6 @@ export default class LayerPipeline {
 
   getHeight(x, y, z) {
     const ctx = this.compute(x, y, z);
-    return ctx.elevation ?? 0;
+    return ctx.rocky ?? ctx.elevation ?? 0;
   }
 }

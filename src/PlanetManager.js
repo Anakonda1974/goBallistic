@@ -70,6 +70,12 @@ export default class PlanetManager {
     }
   }
 
+  setCliffParams({ threshold, boost }) {
+    if (this.pipeline) {
+      this.pipeline.setCliffParams({ threshold, boost });
+    }
+  }
+
   setLayerEnabled(id, enabled) {
     if (this.pipeline) this.pipeline.setEnabled(id, enabled);
   }
