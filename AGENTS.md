@@ -2,10 +2,10 @@
 
 This file lists outstanding tasks and opportunities for future improvements.
 
-- [ ] Implement seeded global Voronoi segmentation for tectonic plates.
-- [ ] Assign each plate a random tangent motion vector.
-- [ ] Classify boundaries as divergent, convergent, or transform.
-- [ ] Modify the heightmap around boundaries to form trenches, ridges, and volcanoes.
+- [x] Implement seeded global Voronoi segmentation for tectonic plates.
+- [x] Assign each plate a random tangent motion vector.
+- [x] Classify boundaries as divergent, convergent, or transform.
+- [x] Modify the heightmap around boundaries to form trenches, ridges, and volcanoes.
 - [x] Introduce a `Plate` structure with center, vector, type, and vertex list.
 - [x] Add a debug view to visualize color-coded plates.
 
