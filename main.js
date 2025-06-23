@@ -18,7 +18,6 @@ camera.position.set(0, 3, 6);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 const planet = new PlanetManager(scene, 1, true, true);
-planet.setDayNightCycleEnabled(true);
 
 const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
@@ -26,6 +25,8 @@ const octaves = document.getElementById('octaves');
 const warp = document.getElementById('warp');
 const cliffThreshold = document.getElementById('cliffThreshold');
 const cliffBoost = document.getElementById('cliffBoost');
+const dayNightCheck = document.getElementById('dayNightCheck');
+planet.setDayNightCycleEnabled(dayNightCheck.checked);
 const baseNoiseCheck = document.getElementById('baseNoiseCheck');
 const tectonicsCheck = document.getElementById('tectonicsCheck');
 const moistureCheck = document.getElementById('moistureCheck');
@@ -63,6 +64,7 @@ function updateParams() {
   planet.setLayerEnabled('rocky', rockyCheck.checked);
   planet.setDebugVisible(layerDebugCheck.checked);
   planet.setDebugLayer(layerSelect.value);
+  planet.setDayNightCycleEnabled(dayNightCheck.checked);
 }
 
 let rebuilding = false;
@@ -93,7 +95,7 @@ rebuildBtn.addEventListener('click', triggerRebuild);
   cliffThreshold, cliffBoost,
   baseNoiseCheck, tectonicsCheck, moistureCheck, temperatureCheck,
   biomeCheck, vegetationCheck, cloudDensityCheck, cloudFlowCheck,
-  rockyCheck, layerDebugCheck, layerSelect
+  rockyCheck, layerDebugCheck, layerSelect, dayNightCheck
 ].forEach(input => {
   input.addEventListener('input', triggerRebuild);
   if (input.type === 'checkbox') {
