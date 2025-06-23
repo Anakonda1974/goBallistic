@@ -24,4 +24,6 @@ This file lists outstanding tasks and opportunities for future improvements.
 - [x] Clamp combined terrain layers to the [-1, 1] range so heightmap
   modifications remain realistic.
 
+- [x] Add a simple day/night cycle by orbiting the directional light around the planet.
+
 

@@ -22,6 +22,8 @@ Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regen
 npm test
 ```
 
+The demo also includes a basic day/night cycle with the main light orbiting the planet.
+
 ## Documentation
 
 See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots).
