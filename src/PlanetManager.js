@@ -143,9 +143,20 @@ export default class PlanetManager {
   }
 
   async rebuild(progressCallback) {
-    for (let i = 0; i < this.chunks.length; i++) {
-      await this.chunks[i].rebuildAsync();
-      if (progressCallback) progressCallback((i + 1) / this.chunks.length);
+    const total = this.chunks.length;
+    const progress = new Array(total).fill(0);
+
+    const update = (idx, p) => {
+      progress[idx] = p;
+      if (progressCallback) {
+        const sum = progress.reduce((a, b) => a + b, 0);
+        progressCallback(sum / total);
+      }
+    };
+
+    for (let i = 0; i < total; i++) {
+      await this.chunks[i].rebuildAsync((p) => update(i, p));
+      update(i, 1);
       await new Promise((r) => requestAnimationFrame(r));
     }
   }

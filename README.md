@@ -16,7 +16,7 @@ This project demonstrates a procedural planet generated with a quadtree level of
 
 ## Usage
 
-Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. Tests can be run with:
+Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar in the UI now updates in real time while geometry is built in Web Workers. Tests can be run with:
 
 ```bash
 npm test
