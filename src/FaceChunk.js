@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+
 import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
+
 
 export default class FaceChunk {
   constructor(face, builder, resolution = 16) {
@@ -44,7 +46,9 @@ export default class FaceChunk {
     scene.add(this.mesh);
   }
 
+
   update(camera, lodController, frustum) {
+
     const distance = camera.position.distanceTo(this.center);
     const targetLevel = lodController.getTargetLevel(distance);
 
@@ -54,8 +58,10 @@ export default class FaceChunk {
       this.rebuild();
     }
 
+
     const visible = frustum ?
       sphereIntersectsFrustum(frustum, this.center, this.radius) : true;
+
     if (this.mesh) this.mesh.visible = visible;
   }
 
