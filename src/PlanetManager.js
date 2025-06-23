@@ -113,24 +113,31 @@ export default class PlanetManager {
       }
     };
 
-    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
+    if (statusCallback)
+      statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
 
-    for (let i = 0; i < total; i++) {
-      const chunk = this.chunks[i];
-      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: i / total });
-      await chunk.rebuildAsync((p) => {
+    const promises = this.chunks.map((chunk, i) => {
+      if (statusCallback)
+        statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: 0 });
+      return chunk.rebuildAsync((p) => {
         update(i, p);
-        if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: (i + p) / total });
+        if (statusCallback) {
+          const sum = progress.reduce((a, b) => a + b, 0);
+          statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: sum / total });
+        }
+      }).then(() => {
+        update(i, 1);
+        if (statusCallback)
+          statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: progress.reduce((a, b) => a + b, 0) / total });
       });
-      update(i, 1);
-      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: (i + 1) / total });
-      await new Promise((r) => requestAnimationFrame(r));
-    }
+    });
 
-    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+    await Promise.all(promises);
+
+    if (statusCallback)
+      statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
 
     this.updateLayerDebug();
-
   }
 
   setDebugVisible(visible) {
