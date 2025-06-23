@@ -39,7 +39,7 @@ Additional controls let you scale the entire planet and toggle on-screen rulers 
 
 ## Documentation
 
-See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md). Information about the tectonic plate system can be found in [`docs/TectonicPlates.md`](docs/TectonicPlates.md).
+See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md). Information about the tectonic plate system can be found in [`docs/TectonicPlates.md`](docs/TectonicPlates.md). See [`docs/Exporting.md`](docs/Exporting.md) for details on exporting chunk geometry.
 
 ## Terrain Layers
 
