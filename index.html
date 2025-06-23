@@ -46,6 +46,24 @@
       <div><label><input id="cloudFlowCheck" type="checkbox" checked> cloudFlow</label></div>
       <div><label><input id="rockyCheck" type="checkbox" checked> rocky</label></div>
     </fieldset>
+    <fieldset>
+      <legend>Layer Debug</legend>
+      <div><label><input id="layerDebugCheck" type="checkbox"> Show Debug</label></div>
+      <div>
+        <select id="layerSelect">
+          <option value="baseNoise">baseNoise</option>
+          <option value="tectonics">tectonics</option>
+          <option value="elevation">elevation</option>
+          <option value="moisture">moisture</option>
+          <option value="temperature">temperature</option>
+          <option value="biome">biome</option>
+          <option value="vegetation">vegetation</option>
+          <option value="cloudDensity">cloudDensity</option>
+          <option value="cloudFlow">cloudFlow</option>
+          <option value="rocky">rocky</option>
+        </select>
+      </div>
+    </fieldset>
     <button id="rebuild">Rebuild</button>
     <div id="progress"><div id="progress-bar"></div></div>
     <div id="status"></div>

@@ -35,6 +35,8 @@ const vegetationCheck = document.getElementById('vegetationCheck');
 const cloudDensityCheck = document.getElementById('cloudDensityCheck');
 const cloudFlowCheck = document.getElementById('cloudFlowCheck');
 const rockyCheck = document.getElementById('rockyCheck');
+const layerDebugCheck = document.getElementById('layerDebugCheck');
+const layerSelect = document.getElementById('layerSelect');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
 const statusDiv = document.getElementById('status');
@@ -59,6 +61,8 @@ function updateParams() {
   planet.setLayerEnabled('cloudDensity', cloudDensityCheck.checked);
   planet.setLayerEnabled('cloudFlow', cloudFlowCheck.checked);
   planet.setLayerEnabled('rocky', rockyCheck.checked);
+  planet.setDebugVisible(layerDebugCheck.checked);
+  planet.setDebugLayer(layerSelect.value);
 }
 
 let rebuilding = false;
@@ -89,10 +93,13 @@ rebuildBtn.addEventListener('click', triggerRebuild);
   cliffThreshold, cliffBoost,
   baseNoiseCheck, tectonicsCheck, moistureCheck, temperatureCheck,
   biomeCheck, vegetationCheck, cloudDensityCheck, cloudFlowCheck,
-  rockyCheck
+  rockyCheck, layerDebugCheck, layerSelect
 ].forEach(input => {
   input.addEventListener('input', triggerRebuild);
   if (input.type === 'checkbox') {
+    input.addEventListener('change', triggerRebuild);
+  }
+  if (input.tagName === 'SELECT') {
     input.addEventListener('change', triggerRebuild);
   }
 });
