@@ -6,6 +6,8 @@ import ChunkLODController from './ChunkLODController.js';
 import createTerrainMaterial from './materials/TerrainShader.js';
 import createWaterMaterial from './materials/WaterShader.js';
 import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, CliffModifier } from './HeightmapStack.js';
+import PlateTectonics from './PlateTectonics.js';
+import PlateModifier from './PlateModifier.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
@@ -30,7 +32,10 @@ export default class PlanetManager {
       this.terrace = new TerraceModifier(8, 0.8);
       this.cliff = new CliffModifier(0.25, 2.2);
 
-      this.modifiers = [this.domainWarp, this.fbm, this.terrace];
+      this.plates = new PlateTectonics(seed, 20, 0.1);
+      this.plateModifier = new PlateModifier(this.plates, 0.05);
+
+      this.modifiers = [this.domainWarp, this.fbm, this.terrace, this.plateModifier];
       for (const m of this.modifiers) this.heightStack.add(m);
 
       this.useDomainWarp = true;
