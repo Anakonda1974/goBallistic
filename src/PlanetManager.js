@@ -105,32 +105,37 @@ export default class PlanetManager {
     const total = this.chunks.length;
     const progress = new Array(total).fill(0);
 
-    const update = (idx, p) => {
-      progress[idx] = p;
-      if (progressCallback) {
-        const sum = progress.reduce((a, b) => a + b, 0);
-        progressCallback(sum / total);
-      }
+    const reportTotal = () => {
+      const sum = progress.reduce((a, b) => a + b, 0);
+      const value = sum / total;
+      if (progressCallback) progressCallback(value);
+      return value;
     };
 
-    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
+    if (statusCallback)
+      statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
 
-    for (let i = 0; i < total; i++) {
-      const chunk = this.chunks[i];
-      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: i / total });
+    const startChunk = async (chunk, i) => {
+      if (statusCallback)
+        statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: reportTotal() });
+
       await chunk.rebuildAsync((p) => {
-        update(i, p);
-        if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: (i + p) / total });
+        progress[i] = p;
+        if (statusCallback)
+          statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: reportTotal() });
       });
-      update(i, 1);
-      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: (i + 1) / total });
-      await new Promise((r) => requestAnimationFrame(r));
-    }
 
-    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+      progress[i] = 1;
+      if (statusCallback)
+        statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: reportTotal() });
+    };
+
+    await Promise.all(this.chunks.map((c, i) => startChunk(c, i)));
+
+    if (statusCallback)
+      statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
 
     this.updateLayerDebug();
-
   }
 
   setDebugVisible(visible) {
