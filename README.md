@@ -4,29 +4,36 @@ This project demonstrates a procedural planet generated with a quadtree level of
 
 ## Setup
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm start
-   ```
-   Then open `http://localhost:5173` in your browser.
+Requires **Node.js 16+**. After cloning the repository install dependencies and start the dev server:
+
+```bash
+npm install
+npm start
+```
+
+The app will be available at `http://localhost:5173`.
+
+To produce an optimized build run:
+
+```bash
+npm run build
+```
 
 ## Usage
 
 
-Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar in the UI now updates in real time while geometry is built in Web Workers. Status messages below the bar show the current subtask in the format `Rebuild -> face (50%)`. Tests can be run with:
+Move the sliders in the UI to tweak noise parameters. Click **Rebuild** to regenerate planet chunks. A progress bar updates in real time while geometry is built in Web Workers. Status messages below the bar show the current subtask in the format `Rebuild -> face (50%)`.
+
+When a WebGL2 renderer is available, set `useGPU` to enable compute shader based height generation. The code automatically falls back to a deterministic CPU implementation when GPU support is missing.
+
+Tests can be run with:
 
 
 ```bash
 npm test
 ```
 
-The demo also includes a basic day/night cycle with the main light orbiting the planet.
-
-
+The demo also includes a basic day/night cycle with the main light orbiting the planet. Enable the debug overlay to view color-coded tectonic plates and inspect individual layer contributions.
 Additional controls let you scale the entire planet and toggle on-screen rulers (grid and axes) for reference.
 
 
