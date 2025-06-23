@@ -1,4 +1,5 @@
 import FastNoiseLite from 'fastnoise-lite';
+import * as THREE from 'three';
 import HeightmapStack, { FBMModifier, DomainWarpModifier } from './HeightmapStack.js';
 import PlateTectonics from './PlateTectonics.js';
 import PlateModifier from './PlateModifier.js';
@@ -72,14 +73,28 @@ export default class LayerPipeline {
 
   computeSlope(x, y, z, eps = 0.002) {
 
-    // Sample the fully modified terrain so rocky areas align with the final
-    // elevation. Use central differences for a more stable gradient.
-    const hx1 = this.computeElevation(x + eps, y, z);
-    const hx2 = this.computeElevation(x - eps, y, z);
-    const hy1 = this.computeElevation(x, y + eps, z);
-    const hy2 = this.computeElevation(x, y - eps, z);
-    const hz1 = this.computeElevation(x, y, z + eps);
-    const hz2 = this.computeElevation(x, y, z - eps);
+    // Reuse boundary data for all nearby samples.
+    const info = this.plates.getBoundaryInfo(
+      new THREE.Vector3(x, y, z),
+      this.plateModifier.boundaryRadius
+    );
+
+    const sample = (sx, sy, sz) =>
+      this.plateModifier.applyWithInfo(
+        info,
+        sx,
+        sy,
+        sz,
+        this.baseStack.getHeight(sx, sy, sz)
+      );
+
+    const hx1 = sample(x + eps, y, z);
+    const hx2 = sample(x - eps, y, z);
+    const hy1 = sample(x, y + eps, z);
+    const hy2 = sample(x, y - eps, z);
+    const hz1 = sample(x, y, z + eps);
+    const hz2 = sample(x, y, z - eps);
+
     const dx = (hx1 - hx2) / (2 * eps);
     const dy = (hy1 - hy2) / (2 * eps);
     const dz = (hz1 - hz2) / (2 * eps);
