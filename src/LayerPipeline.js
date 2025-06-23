@@ -33,7 +33,13 @@ export default class LayerPipeline {
 
     this.addLayer('baseNoise', (x, y, z, ctx) => this.baseStack.getHeight(x, y, z));
     this.addLayer('tectonics', (x, y, z, ctx) => this.plateModifier.apply(x, y, z, ctx.baseNoise || 0));
-    this.addLayer('elevation', (x, y, z, ctx) => (ctx.baseNoise || 0) + (ctx.tectonics || 0));
+    this.addLayer('elevation', (x, y, z, ctx) => {
+      const base = ctx.baseNoise || 0;
+      const tect = ctx.tectonics || 0;
+      // Blend the layers and clamp to keep terrain heights realistic
+      const h = base + tect;
+      return Math.max(-1, Math.min(1, h));
+    });
     this.addLayer('moisture', (x, y, z) => fnl.GetNoise(x * 0.5, y * 0.5, z * 0.5));
     this.addLayer('temperature', (x, y, z, ctx) => {
       const lat = Math.abs(y);
