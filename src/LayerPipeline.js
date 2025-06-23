@@ -1,6 +1,6 @@
 import FastNoiseLite from 'fastnoise-lite';
 import * as THREE from 'three';
-import HeightmapStack, { FBMModifier, DomainWarpModifier } from './HeightmapStack.js';
+import HeightmapStack, { FBMModifier, DomainWarpModifier, WorleyModifier } from './HeightmapStack.js';
 import PlateTectonics from './PlateTectonics.js';
 import PlateModifier from './PlateModifier.js';
 
@@ -25,13 +25,18 @@ export default class LayerPipeline {
 
     const fnl = new FastNoiseLite(seed);
     fnl.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+    const cellular = new FastNoiseLite(seed);
+    cellular.SetNoiseType(FastNoiseLite.NoiseType.Cellular);
+    cellular.SetCellularReturnType(FastNoiseLite.CellularReturnType.CellValue);
 
     // base noise stack
     this.baseStack = new HeightmapStack(seed);
     this.domainWarp = new DomainWarpModifier(fnl, 0.2);
     this.fbm = new FBMModifier(fnl, 1.0, 1.2, 5);
+    this.worley = new WorleyModifier(cellular, [0], [1]);
     this.baseStack.add(this.domainWarp);
     this.baseStack.add(this.fbm);
+    this.baseStack.add(this.worley);
 
     this.cliffParams = { threshold: 0.3, boost: 2.0 };
 
@@ -135,11 +140,28 @@ export default class LayerPipeline {
     return withLayer - without;
   }
 
-  setBaseNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
+  setBaseNoiseParams({
+    amplitude,
+    frequency,
+    octaves,
+    warpIntensity,
+    fbmOctaves,
+    worleyOctaves,
+  }) {
     if (amplitude !== undefined) this.fbm.amplitude = amplitude;
     if (frequency !== undefined) this.fbm.frequency = frequency;
     if (octaves !== undefined) this.fbm.octaves = octaves;
     if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
+    if (fbmOctaves) {
+      const amps = fbmOctaves.map(o => o.amp);
+      const freqs = fbmOctaves.map(o => o.freq);
+      this.fbm.setParams({ octaveAmplitudes: amps, octaveFrequencies: freqs });
+    }
+    if (worleyOctaves) {
+      const amps = worleyOctaves.map(o => o.amp);
+      const freqs = worleyOctaves.map(o => o.freq);
+      this.worley.setParams({ amplitudes: amps, frequencies: freqs });
+    }
   }
 
   setCliffParams({ threshold, boost }) {
