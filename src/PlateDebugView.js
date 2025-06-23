@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+
 export default class PlateDebugView {
   constructor(plates, radius = 1) {
     this.plates = plates;
