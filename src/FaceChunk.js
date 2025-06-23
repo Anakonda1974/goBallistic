@@ -88,7 +88,13 @@ export default class FaceChunk {
           this.worker = new Worker(new URL('./workers/geometryWorker.js', import.meta.url), { type: 'module' });
         }
         const data = await new Promise((resolve) => {
-          this.worker.onmessage = (e) => resolve(e.data);
+          this.worker.onmessage = (e) => {
+            if (e.data.progress !== undefined) {
+              if (progressCallback) progressCallback(e.data.progress);
+            } else {
+              resolve(e.data);
+            }
+          };
           this.worker.postMessage({
             face: this.face,
             resolution: this.resolution,

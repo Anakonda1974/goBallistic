@@ -16,5 +16,9 @@ This file lists outstanding tasks and opportunities for future improvements.
 
 ## New Tasks
 
+- [x] Replace placeholder screenshots with actual captures from the demo.
+
+
 - [ ] Improve progress reporting when geometry is generated in Web Workers.
+
 
