@@ -60,8 +60,10 @@ export class TerraceModifier extends Modifier {
   }
 
   apply(x, y, z, prevHeight, context) {
-    const stepped = Math.floor(prevHeight * this.steps) / this.steps;
-    return stepped * this.heightRange;
+    const normalized = (prevHeight + 1) / 2;
+    const stepped =
+      Math.round(normalized * (this.steps - 1)) / (this.steps - 1);
+    return (stepped * 2 - 1) * this.heightRange;
   }
 }
 

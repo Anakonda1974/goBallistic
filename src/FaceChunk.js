@@ -91,15 +91,4 @@ export default class FaceChunk {
       this.rebuilding = false;
     }
   }
-
-  async rebuildAsync(progressCallback) {
-    if (!this.mesh) return;
-    const newGeom = await this.builder.buildFaceAsync(
-      this.face,
-      this.resolution,
-      progressCallback
-    );
-    this.mesh.geometry.dispose();
-    this.mesh.geometry = newGeom;
-  }
 }
