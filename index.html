@@ -25,32 +25,19 @@
       <label>Octaves <input id="octaves" type="number" min="1" max="8" value="5"></label>
     </div>
     <div>
-      <label><input id="domainWarpCheck" type="checkbox" checked> Domain Warp</label>
-    </div>
-    <div>
       <label>Warp Intensity <input id="warp" type="range" min="0" max="1" step="0.05" value="0.2"></label>
     </div>
-    <div>
-      <label><input id="terraceCheck" type="checkbox" checked> Terracing</label>
-    </div>
-    <div>
-      <label>Terrace Steps <input id="terraceSteps" type="number" min="1" max="20" value="8"></label>
-    </div>
-    <div>
-      <label>Terrace Range <input id="terraceRange" type="range" min="0" max="1" step="0.05" value="0.8"></label>
-    </div>
-    <div>
-      <label><input id="plateauCheck" type="checkbox"> Plateau</label>
-    </div>
-    <div>
-      <label>Plateau Threshold <input id="plateauThreshold" type="range" min="0" max="1" step="0.05" value="0.5"></label>
-    </div>
-    <div>
-      <label>Plateau Factor <input id="plateauFactor" type="range" min="0" max="1" step="0.05" value="0.3"></label>
-    </div>
-    <div>
-      <label><input id="cliffCheck" type="checkbox"> Cliffs</label>
-    </div>
+    <fieldset>
+      <legend>Layers</legend>
+      <div><label><input id="baseNoiseCheck" type="checkbox" checked> baseNoise</label></div>
+      <div><label><input id="tectonicsCheck" type="checkbox" checked> tectonics</label></div>
+      <div><label><input id="moistureCheck" type="checkbox" checked> moisture</label></div>
+      <div><label><input id="temperatureCheck" type="checkbox" checked> temperature</label></div>
+      <div><label><input id="biomeCheck" type="checkbox" checked> biome</label></div>
+      <div><label><input id="vegetationCheck" type="checkbox" checked> vegetation</label></div>
+      <div><label><input id="cloudDensityCheck" type="checkbox" checked> cloudDensity</label></div>
+      <div><label><input id="cloudFlowCheck" type="checkbox" checked> cloudFlow</label></div>
+    </fieldset>
     <button id="rebuild">Rebuild</button>
     <div id="progress"><div id="progress-bar"></div></div>
   </div>
