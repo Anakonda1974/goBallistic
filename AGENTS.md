@@ -6,8 +6,8 @@ This file lists outstanding tasks and opportunities for future improvements.
 - [ ] Assign each plate a random tangent motion vector.
 - [ ] Classify boundaries as divergent, convergent, or transform.
 - [ ] Modify the heightmap around boundaries to form trenches, ridges, and volcanoes.
-- [ ] Introduce a `Plate` structure with center, vector, type, and vertex list.
-- [ ] Add a debug view to visualize color-coded plates.
+- [x] Introduce a `Plate` structure with center, vector, type, and vertex list.
+- [x] Add a debug view to visualize color-coded plates.
 
 - [x] Integrate GPU-based height map generation in `PlanetManager`.
 
@@ -19,6 +19,6 @@ This file lists outstanding tasks and opportunities for future improvements.
 - [x] Replace placeholder screenshots with actual captures from the demo.
 
 
-- [ ] Improve progress reporting when geometry is generated in Web Workers.
+- [x] Improve progress reporting when geometry is generated in Web Workers.
 
 
