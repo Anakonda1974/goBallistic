@@ -105,34 +105,34 @@ export default class PlanetManager {
     const total = this.chunks.length;
     const progress = new Array(total).fill(0);
 
-    const update = (idx, p) => {
-      progress[idx] = p;
-      if (progressCallback) {
-        const sum = progress.reduce((a, b) => a + b, 0);
-        progressCallback(sum / total);
-      }
+    const reportTotal = () => {
+      const sum = progress.reduce((a, b) => a + b, 0);
+      const value = sum / total;
+      if (progressCallback) progressCallback(value);
+      return value;
     };
 
     if (statusCallback)
       statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
 
-    const promises = this.chunks.map((chunk, i) => {
-      if (statusCallback)
-        statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: 0 });
-      return chunk.rebuildAsync((p) => {
-        update(i, p);
-        if (statusCallback) {
-          const sum = progress.reduce((a, b) => a + b, 0);
-          statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: sum / total });
-        }
-      }).then(() => {
-        update(i, 1);
-        if (statusCallback)
-          statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: progress.reduce((a, b) => a + b, 0) / total });
-      });
-    });
 
-    await Promise.all(promises);
+    const startChunk = async (chunk, i) => {
+      if (statusCallback)
+        statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: reportTotal() });
+
+      await chunk.rebuildAsync((p) => {
+        progress[i] = p;
+        if (statusCallback)
+          statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: reportTotal() });
+      });
+
+      progress[i] = 1;
+      if (statusCallback)
+        statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: reportTotal() });
+    };
+
+    await Promise.all(this.chunks.map((c, i) => startChunk(c, i)));
+
 
     if (statusCallback)
       statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
