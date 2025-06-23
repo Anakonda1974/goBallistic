@@ -35,12 +35,21 @@ function updateParams() {
   });
 }
 
-rebuildBtn.addEventListener('click', async () => {
+let rebuilding = false;
+async function triggerRebuild() {
+  if (rebuilding) return;
+  rebuilding = true;
   updateParams();
   progressBar.style.width = '0%';
   await planet.rebuild(p => {
     progressBar.style.width = `${p * 100}%`;
   });
+  rebuilding = false;
+}
+
+rebuildBtn.addEventListener('click', triggerRebuild);
+[amp, freq, octaves, warp].forEach(input => {
+  input.addEventListener('input', triggerRebuild);
 });
 
 function animate() {
