@@ -6,18 +6,25 @@ export class Modifier {
 }
 
 export class FBMModifier extends Modifier {
-  constructor(fnlInstance, amplitude = 1.0, frequency = 1.0, octaves = 5) {
+  constructor(
+    fnlInstance,
+    amplitude = 1.0,
+    frequency = 1.0,
+    octaves = 5,
+    octaveAmplitudes = null,
+    octaveFrequencies = null
+  ) {
     super();
     this.fnl = fnlInstance;
     this.amplitude = amplitude;
     this.frequency = frequency;
     this.octaves = octaves;
+    this.octaveAmplitudes = octaveAmplitudes;
+    this.octaveFrequencies = octaveFrequencies;
   }
 
   apply(x, y, z, prevHeight, context) {
     let value = 0;
-    let amp = this.amplitude;
-    let freq = this.frequency;
 
     let sx = x;
     let sy = y;
@@ -28,13 +35,69 @@ export class FBMModifier extends Modifier {
       sz = context.warped.z;
     }
 
-    for (let i = 0; i < this.octaves; i++) {
-      value += this.fnl.GetNoise(sx * freq, sy * freq, sz * freq) * amp;
-      freq *= 2;
-      amp *= 0.5;
+    if (this.octaveAmplitudes && this.octaveFrequencies) {
+      for (let i = 0; i < this.octaveAmplitudes.length; i++) {
+        const amp = this.octaveAmplitudes[i] ?? 0;
+        const freq = this.octaveFrequencies[i] ?? 1;
+        value += this.fnl.GetNoise(sx * freq, sy * freq, sz * freq) * amp;
+      }
+    } else {
+      let amp = this.amplitude;
+      let freq = this.frequency;
+      for (let i = 0; i < this.octaves; i++) {
+        value += this.fnl.GetNoise(sx * freq, sy * freq, sz * freq) * amp;
+        freq *= 2;
+        amp *= 0.5;
+      }
     }
 
     return prevHeight + value;
+  }
+
+  setParams({
+    amplitude,
+    frequency,
+    octaves,
+    octaveAmplitudes,
+    octaveFrequencies,
+  }) {
+    if (amplitude !== undefined) this.amplitude = amplitude;
+    if (frequency !== undefined) this.frequency = frequency;
+    if (octaves !== undefined) this.octaves = octaves;
+    if (octaveAmplitudes !== undefined) this.octaveAmplitudes = octaveAmplitudes;
+    if (octaveFrequencies !== undefined) this.octaveFrequencies = octaveFrequencies;
+  }
+}
+
+export class WorleyModifier extends Modifier {
+  constructor(fnlInstance, amplitudes = [1], frequencies = [1]) {
+    super();
+    this.fnl = fnlInstance;
+    this.amplitudes = amplitudes;
+    this.frequencies = frequencies;
+  }
+
+  apply(x, y, z, prevHeight, context) {
+    let value = 0;
+    let sx = x;
+    let sy = y;
+    let sz = z;
+    if (context.warped) {
+      sx = context.warped.x;
+      sy = context.warped.y;
+      sz = context.warped.z;
+    }
+    for (let i = 0; i < this.amplitudes.length; i++) {
+      const amp = this.amplitudes[i] ?? 0;
+      const freq = this.frequencies[i] ?? 1;
+      value += this.fnl.GetNoise(sx * freq, sy * freq, sz * freq) * amp;
+    }
+    return prevHeight + value;
+  }
+
+  setParams({ amplitudes, frequencies }) {
+    if (amplitudes !== undefined) this.amplitudes = amplitudes;
+    if (frequencies !== undefined) this.frequencies = frequencies;
   }
 }
 

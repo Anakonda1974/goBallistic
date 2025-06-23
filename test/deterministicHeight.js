@@ -36,3 +36,4 @@ import './gpuHeight.js';
 import './plateModifier.js';
 import './exportTools.js';
 import './layerInfluence.js';
+import './worleyModifier.js';
