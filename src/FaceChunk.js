@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
 
 import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
 
@@ -45,7 +46,6 @@ export default class FaceChunk {
     if (!this.mesh) this.createMesh();
     scene.add(this.mesh);
   }
-
 
   update(camera, lodController, frustum) {
 
