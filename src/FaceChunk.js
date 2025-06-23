@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
 
-import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
-
-
 export default class FaceChunk {
   constructor(face, builder, resolution = 16) {
     this.face = face;
@@ -68,6 +65,17 @@ export default class FaceChunk {
   rebuild() {
     if (!this.mesh) return;
     const newGeom = this.builder.buildFace(this.face, this.resolution);
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = newGeom;
+  }
+
+  async rebuildAsync(progressCallback) {
+    if (!this.mesh) return;
+    const newGeom = await this.builder.buildFaceAsync(
+      this.face,
+      this.resolution,
+      progressCallback
+    );
     this.mesh.geometry.dispose();
     this.mesh.geometry = newGeom;
   }
