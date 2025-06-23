@@ -35,3 +35,4 @@ import './rockyLayer.js';
 import './gpuHeight.js';
 import './plateModifier.js';
 import './exportTools.js';
+import './layerInfluence.js';

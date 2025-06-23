@@ -125,6 +125,16 @@ export default class LayerPipeline {
     this.enabled.set(id, enabled);
   }
 
+  getLayerInfluence(id, x, y, z) {
+    const original = this.enabled.get(id);
+    this.enabled.set(id, false);
+    const without = this.getHeight(x, y, z);
+    this.enabled.set(id, true);
+    const withLayer = this.getHeight(x, y, z);
+    this.enabled.set(id, original);
+    return withLayer - without;
+  }
+
   setBaseNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
     if (amplitude !== undefined) this.fbm.amplitude = amplitude;
     if (frequency !== undefined) this.fbm.frequency = frequency;
