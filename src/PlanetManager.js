@@ -66,14 +66,16 @@ export default class PlanetManager {
       this.chunks.push(chunk);
     }
 
-    this.water = new THREE.Mesh(
-      new THREE.SphereGeometry(radius * 0.99, 32, 32),
-      createWaterMaterial({ envMap: scene.environment || null })
-    );
-    scene.add(this.water);
-    this.debugView.addToScene(scene);
-    this.debugView.group.visible = false;
-    this.showDebug = false;
+      this.water = new THREE.Mesh(
+        new THREE.SphereGeometry(radius * 0.99, 32, 32),
+        createWaterMaterial({ envMap: scene.environment || null })
+      );
+      scene.add(this.water);
+      if (this.debugView) {
+        this.debugView.addToScene(scene);
+        this.debugView.group.visible = false;
+      }
+      this.showDebug = false;
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 5, 5);
@@ -168,7 +170,9 @@ export default class PlanetManager {
 
   setDebugVisible(visible) {
     this.showDebug = visible;
-    this.debugView.group.visible = visible;
+    if (this.debugView) {
+      this.debugView.group.visible = visible;
+    }
   }
 
   update(camera) {
