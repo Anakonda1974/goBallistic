@@ -58,7 +58,7 @@ ProceduralPlanetLOD aims to create a fully procedural planet that dynamically ad
   - `CliffModifier` ![cliff](docs/screenshots/cliff.png)
 
 ### Shader Structure
-- **TerrainShader** colors terrain based on height or biome data.
+- **TerrainShader** colors terrain based on height, blending rock and snow on steep slopes.
 - **WaterShader** (optional) renders a water surface with transparency and simple waves.
 
 ## Implementation Plan

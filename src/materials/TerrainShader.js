@@ -6,6 +6,7 @@ uniform float uFrequency;
 uniform float uSeed;
 uniform float uRadius;
 varying float vHeight;
+varying vec3 vPos;
 
 float random(vec3 p) {
   return fract(sin(dot(p + uSeed, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
@@ -44,21 +45,34 @@ float fbm(vec3 p) {
 }
 
 void main() {
-  vec3 pos = position;
-  float h = fbm(normalize(pos) * uFrequency);
+  vec3 pos = normalize(position);
+  float h = fbm(pos * uFrequency);
   vHeight = h;
-  pos = normalize(pos) * (uRadius + h * uAmplitude);
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  vPos = pos * (uRadius + h * uAmplitude);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(vPos, 1.0);
 }
 `;
 
 const fragmentShader = /* glsl */`
 varying float vHeight;
+varying vec3 vPos;
+
+uniform vec3 lowColor;
+uniform vec3 midColor;
+uniform vec3 highColor;
+
+float getSlope() {
+  vec3 dx = dFdx(vPos);
+  vec3 dy = dFdy(vPos);
+  vec3 normal = normalize(cross(dx, dy));
+  return 1.0 - dot(normal, normalize(vPos));
+}
 
 void main() {
-  vec3 low = vec3(0.2, 0.6, 0.3);
-  vec3 high = vec3(1.0, 1.0, 1.0);
-  vec3 color = mix(low, high, vHeight * 0.5 + 0.5);
+  float heightT = clamp(vHeight * 0.5 + 0.5, 0.0, 1.0);
+  float slope = clamp(getSlope() * 3.0, 0.0, 1.0);
+  vec3 base = mix(lowColor, highColor, heightT);
+  vec3 color = mix(base, midColor, slope);
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -68,6 +82,9 @@ export default function createTerrainMaterial({
   frequency = 1.0,
   seed = 0.0,
   radius = 1.0,
+  lowColor = new THREE.Color(0x355e3b),
+  midColor = new THREE.Color(0x8a7e66),
+  highColor = new THREE.Color(0xffffff),
 } = {}) {
   return new THREE.ShaderMaterial({
     uniforms: {
@@ -75,6 +92,9 @@ export default function createTerrainMaterial({
       uFrequency: { value: frequency },
       uSeed: { value: seed },
       uRadius: { value: radius },
+      lowColor: { value: lowColor },
+      midColor: { value: midColor },
+      highColor: { value: highColor },
     },
     vertexShader,
     fragmentShader,
