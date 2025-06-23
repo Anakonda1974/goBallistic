@@ -11,10 +11,12 @@ occasional volcanic peaks, while transform boundaries apply a subtle displacemen
 
 A `PlateDebugView` helper can visualize plate assignments by color.
 
+
 **Parameters**
 - `plateCount` – number of plates to generate (default `20`).
 - `boundaryRadius` – distance used when searching for boundary information (default `0.1`).
 - `effectRadius` – radius around boundaries that deform the heightmap (default `0.05`).
+
 
 ```js
 import LayerPipeline from './src/LayerPipeline.js';
