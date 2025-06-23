@@ -7,18 +7,25 @@ import createWaterMaterial from './materials/WaterShader.js';
 import LayerPipeline from './LayerPipeline.js';
 import PlateDebugView from './PlateDebugView.js';
 import LayerDebugView from './LayerDebugView.js';
+import GPUHeightGenerator from './GPUHeightGenerator.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
-  constructor(scene, radius = 1, useGPU = true, useWorker = false) {
+  constructor(scene, radius = 1, useGPU = true, useWorker = false, renderer = null) {
     this.scene = scene;
     this.useGPU = useGPU;
     this.useWorker = useWorker;
+    this.renderer = renderer;
 
     const seed = 1234;
     this.seed = seed;
     if (this.useGPU) {
-      this.heightStack = { getHeight() { return 0; } };
+      if (this.renderer) {
+        this.gpuHeight = new GPUHeightGenerator(this.renderer, 33);
+        this.heightStack = this.gpuHeight;
+      } else {
+        this.heightStack = { getHeight() { return 0; } };
+      }
     } else {
       this.pipeline = new LayerPipeline(seed);
       this.heightStack = this.pipeline;
