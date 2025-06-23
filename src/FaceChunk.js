@@ -31,4 +31,11 @@ export default class FaceChunk {
   update(camera) {
     // LOD update placeholder
   }
+
+  rebuild() {
+    if (!this.mesh) return;
+    const newGeom = this.builder.buildFace(this.face, this.resolution);
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = newGeom;
+  }
 }

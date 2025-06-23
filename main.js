@@ -19,6 +19,30 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 const planet = new PlanetManager(scene);
 
+const amp = document.getElementById('amp');
+const freq = document.getElementById('freq');
+const octaves = document.getElementById('octaves');
+const warp = document.getElementById('warp');
+const rebuildBtn = document.getElementById('rebuild');
+const progressBar = document.getElementById('progress-bar');
+
+function updateParams() {
+  planet.setNoiseParams({
+    amplitude: parseFloat(amp.value),
+    frequency: parseFloat(freq.value),
+    octaves: parseInt(octaves.value, 10),
+    warpIntensity: parseFloat(warp.value)
+  });
+}
+
+rebuildBtn.addEventListener('click', async () => {
+  updateParams();
+  progressBar.style.width = '0%';
+  await planet.rebuild(p => {
+    progressBar.style.width = `${p * 100}%`;
+  });
+});
+
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
