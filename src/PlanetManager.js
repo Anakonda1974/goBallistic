@@ -5,6 +5,7 @@ import FaceChunk from './FaceChunk.js';
 import ChunkLODController from './ChunkLODController.js';
 import createTerrainMaterial from './materials/TerrainShader.js';
 import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, CliffModifier } from './HeightmapStack.js';
+import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
   constructor(scene, radius = 1) {
@@ -56,8 +57,9 @@ export default class PlanetManager {
   }
 
   update(camera) {
+    const frustum = getCameraFrustum(camera);
     for (const chunk of this.chunks) {
-      chunk.update(camera, this.lod);
+      chunk.update(camera, this.lod, frustum);
     }
   }
 }
