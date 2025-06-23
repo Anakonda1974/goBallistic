@@ -27,6 +27,12 @@
     <div>
       <label>Warp Intensity <input id="warp" type="range" min="0" max="1" step="0.05" value="0.2"></label>
     </div>
+    <div>
+      <label>Cliff Threshold <input id="cliffThreshold" type="range" min="0" max="1" step="0.05" value="0.3"></label>
+    </div>
+    <div>
+      <label>Cliff Boost <input id="cliffBoost" type="range" min="1" max="4" step="0.1" value="2"></label>
+    </div>
     <fieldset>
       <legend>Layers</legend>
       <div><label><input id="baseNoiseCheck" type="checkbox" checked> baseNoise</label></div>
@@ -37,6 +43,7 @@
       <div><label><input id="vegetationCheck" type="checkbox" checked> vegetation</label></div>
       <div><label><input id="cloudDensityCheck" type="checkbox" checked> cloudDensity</label></div>
       <div><label><input id="cloudFlowCheck" type="checkbox" checked> cloudFlow</label></div>
+      <div><label><input id="rockyCheck" type="checkbox" checked> rocky</label></div>
     </fieldset>
     <button id="rebuild">Rebuild</button>
     <div id="progress"><div id="progress-bar"></div></div>
