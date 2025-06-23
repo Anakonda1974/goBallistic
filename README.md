@@ -32,7 +32,7 @@ Additional controls let you scale the entire planet and toggle on-screen rulers 
 
 ## Documentation
 
-See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md).
+See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md). Information about the tectonic plate system can be found in [`docs/TectonicPlates.md`](docs/TectonicPlates.md).
 
 ## Terrain Layers
 
@@ -49,3 +49,19 @@ for realistic geometry. The main layers are:
 
 Adjusting these layers in the UI or code allows experimentation while keeping
 terrain generation stable.
+
+### Customizing Tectonic Plates
+
+`LayerPipeline` accepts an optional options object to configure plate parameters.
+
+```js
+import LayerPipeline from './src/LayerPipeline.js';
+
+const pipeline = new LayerPipeline(42, {
+  plateCount: 32,
+  boundaryRadius: 0.1,
+  effectRadius: 0.05
+});
+```
+
+See [`docs/TectonicPlates.md`](docs/TectonicPlates.md) for details.
