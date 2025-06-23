@@ -73,11 +73,12 @@ export default class LayerPipeline {
 
   computeSlope(x, y, z, eps = 0.002) {
 
-    // Reuse boundary data for all nearby samples.
+
     const info = this.plates.getBoundaryInfo(
       new THREE.Vector3(x, y, z),
       this.plateModifier.boundaryRadius
     );
+
 
     const sample = (sx, sy, sz) =>
       this.plateModifier.applyWithInfo(
@@ -98,6 +99,7 @@ export default class LayerPipeline {
     const dx = (hx1 - hx2) / (2 * eps);
     const dy = (hy1 - hy2) / (2 * eps);
     const dz = (hz1 - hz2) / (2 * eps);
+
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 
   }
