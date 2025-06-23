@@ -21,7 +21,9 @@ export default class PlanetManager {
     this.seed = seed;
     if (this.useGPU) {
       if (this.renderer) {
+
         this.gpuHeight = new GPUHeightGenerator(this.renderer, 33, seed);
+
         this.heightStack = this.gpuHeight;
       } else {
         this.heightStack = { getHeight() { return 0; } };
