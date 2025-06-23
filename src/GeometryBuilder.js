@@ -54,4 +54,40 @@ export default class GeometryBuilder {
     geometry.computeVertexNormals();
     return geometry;
   }
+
+  async buildFaceAsync(face, resolution = 16, progressCallback) {
+    const vertices = [];
+    const indices = [];
+    for (let y = 0; y <= resolution; y++) {
+      for (let x = 0; x <= resolution; x++) {
+        const u = (x / resolution) * 2 - 1;
+        const v = (y / resolution) * 2 - 1;
+        const cube = cubeFaceVector(face, u, v);
+        const sphere = cubeToSphere(cube);
+        const height = this.getVertexHeight(sphere.x, sphere.y, sphere.z);
+        vertices.push(
+          sphere.x * this.radius * height,
+          sphere.y * this.radius * height,
+          sphere.z * this.radius * height
+        );
+      }
+      if (progressCallback) progressCallback(y / resolution);
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    for (let y = 0; y < resolution; y++) {
+      for (let x = 0; x < resolution; x++) {
+        const i = y * (resolution + 1) + x;
+        const a = i;
+        const b = i + 1;
+        const c = i + resolution + 1;
+        const d = c + 1;
+        indices.push(a, c, b, b, c, d);
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return geometry;
+  }
 }

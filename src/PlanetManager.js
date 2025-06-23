@@ -4,6 +4,7 @@ import GeometryBuilder from './GeometryBuilder.js';
 import FaceChunk from './FaceChunk.js';
 import ChunkLODController from './ChunkLODController.js';
 import createTerrainMaterial from './materials/TerrainShader.js';
+import createWaterMaterial from './materials/WaterShader.js';
 import HeightmapStack, { FBMModifier, DomainWarpModifier, TerraceModifier, CliffModifier } from './HeightmapStack.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
@@ -35,6 +36,12 @@ export default class PlanetManager {
       this.chunks.push(chunk);
     }
 
+    this.water = new THREE.Mesh(
+      new THREE.SphereGeometry(radius * 0.99, 32, 32),
+      createWaterMaterial()
+    );
+    scene.add(this.water);
+
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 5, 5);
     scene.add(light);
@@ -50,9 +57,9 @@ export default class PlanetManager {
 
   async rebuild(progressCallback) {
     for (let i = 0; i < this.chunks.length; i++) {
-      this.chunks[i].rebuild();
+      await this.chunks[i].rebuildAsync();
       if (progressCallback) progressCallback((i + 1) / this.chunks.length);
-      await new Promise(requestAnimationFrame);
+      await new Promise((r) => requestAnimationFrame(r));
     }
   }
 
