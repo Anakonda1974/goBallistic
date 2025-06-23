@@ -27,3 +27,17 @@ This file lists outstanding tasks and opportunities for future improvements.
 - [x] Add a simple day/night cycle by orbiting the directional light around the planet.
 
 
+
+## Open Issues
+
+The following items remain unfinished or have been identified as longer-term goals. Addressing them will push the project toward a more complete simulation.
+
+- [ ] **GPU heightmap pipeline** – the current GPU code path returns zero heights. Implement actual compute shaders or a GPU.js workflow and ensure tests validate parity with CPU results.
+- [ ] **Biome integration** – generate temperature and humidity maps, then blend layers based on those values to produce varied biomes.
+- [ ] **Atmospheric scattering** – add a shader-based atmosphere to enhance realism.
+- [ ] **Advanced water simulation** – extend `WaterShader` with wave dynamics and reflections.
+- [ ] **Export tools** – allow patch geometry to be exported as OBJ/GLTF using Three.js exporters.
+- [ ] **Landing/zoom mode** – implement camera transitions for surface exploration and update LOD accordingly.
+- [ ] **Mini-map/overview** – provide a separate debug view showing chunk boundaries from afar.
+
+Each item should be tackled in isolation on feature branches, accompanied by targeted tests and documentation updates.
