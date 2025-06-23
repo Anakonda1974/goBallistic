@@ -22,9 +22,7 @@ const grid = new THREE.GridHelper(4, 4);
 scene.add(axes);
 scene.add(grid);
 
-// Use CPU-based height generation by default so all layers work
-// Set the third argument to `true` to enable GPU compute shaders
-const planet = new PlanetManager(scene, 1, false, true, renderer);
+let planet;
 
 const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
@@ -33,7 +31,6 @@ const warp = document.getElementById('warp');
 const cliffThreshold = document.getElementById('cliffThreshold');
 const cliffBoost = document.getElementById('cliffBoost');
 const dayNightCheck = document.getElementById('dayNightCheck');
-planet.setDayNightCycleEnabled(dayNightCheck.checked);
 const baseNoiseCheck = document.getElementById('baseNoiseCheck');
 const tectonicsCheck = document.getElementById('tectonicsCheck');
 const moistureCheck = document.getElementById('moistureCheck');
@@ -47,6 +44,7 @@ const layerDebugCheck = document.getElementById('layerDebugCheck');
 const layerSelect = document.getElementById('layerSelect');
 const scaleInput = document.getElementById('scale');
 const rulerCheck = document.getElementById('rulerCheck');
+const gpuCheck = document.getElementById('gpuCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const resetBtn = document.getElementById('reset');
 const ui = document.getElementById('ui');
@@ -54,9 +52,18 @@ const toggleBtn = document.getElementById('toggle-ui');
 const progressBar = document.getElementById('progress-bar');
 const statusDiv = document.getElementById('status');
 
+function createPlanet() {
+  if (planet) {
+    scene.remove(planet.group);
+  }
+  planet = new PlanetManager(scene, 1, gpuCheck.checked, true, renderer);
+}
+
+createPlanet();
+updateParams();
+
 axes.visible = rulerCheck.checked;
 grid.visible = rulerCheck.checked;
-planet.setScale(parseFloat(scaleInput.value));
 
 function updateParams() {
   planet.setNoiseParams({
@@ -154,6 +161,12 @@ toggleBtn.addEventListener('click', () => {
   if (input.type === 'checkbox') {
     input.addEventListener('change', updateParams);
   }
+});
+
+gpuCheck.addEventListener('change', () => {
+  createPlanet();
+  updateParams();
+  triggerRebuild();
 });
 
 function animate() {
