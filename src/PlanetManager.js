@@ -115,6 +115,7 @@ export default class PlanetManager {
     if (statusCallback)
       statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
 
+
     const startChunk = async (chunk, i) => {
       if (statusCallback)
         statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: reportTotal() });
@@ -131,6 +132,7 @@ export default class PlanetManager {
     };
 
     await Promise.all(this.chunks.map((c, i) => startChunk(c, i)));
+
 
     if (statusCallback)
       statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
