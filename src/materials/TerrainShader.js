@@ -98,6 +98,11 @@ export default function createTerrainMaterial({
     },
     vertexShader,
     fragmentShader,
-    flatShading: true,
+    side: THREE.DoubleSide,
+    blending: THREE.NormalBlending,
+    depthTest: true,
+   
+   
+   
   });
 }
