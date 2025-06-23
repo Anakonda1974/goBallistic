@@ -21,4 +21,7 @@ This file lists outstanding tasks and opportunities for future improvements.
 
 - [x] Improve progress reporting when geometry is generated in Web Workers.
 
+- [x] Clamp combined terrain layers to the [-1, 1] range so heightmap
+  modifications remain realistic.
+
 

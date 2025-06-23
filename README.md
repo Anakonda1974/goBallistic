@@ -25,3 +25,18 @@ npm test
 ## Documentation
 
 See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots).
+
+## Terrain Layers
+
+The `LayerPipeline` combines several modifiers to create the final heightmap. Layers
+are evaluated in order and clamped so the resulting heights remain within `[-1, 1]`
+for realistic geometry. The main layers are:
+
+1. **baseNoise** – domain‑warped fractal noise defining large-scale features.
+2. **tectonics** – displaces terrain near plate boundaries to form trenches and ridges.
+3. **elevation** – merges the previous layers and clamps the result to prevent
+   extreme spikes or pits.
+4. **moisture/temperature** – additional noise used for biome selection.
+
+Adjusting these layers in the UI or code allows experimentation while keeping
+terrain generation stable.
