@@ -12,7 +12,14 @@ export default class PlateModifier extends Modifier {
   }
 
   apply(x, y, z, prevHeight) {
-    const info = this.plates.getBoundaryInfo(new THREE.Vector3(x, y, z), this.boundaryRadius);
+    const info = this.plates.getBoundaryInfo(
+      new THREE.Vector3(x, y, z),
+      this.boundaryRadius
+    );
+    return this.applyWithInfo(info, x, y, z, prevHeight);
+  }
+
+  applyWithInfo(info, x, y, z, prevHeight) {
     if (!info) return prevHeight;
     const falloff = 1 - info.distance / this.boundaryRadius;
     switch (info.type) {
@@ -21,7 +28,11 @@ export default class PlateModifier extends Modifier {
       case 'convergent': {
         const volcanoFactor = Math.pow(falloff, 4);
         const volcanoNoise = this.noise.GetNoise(x * 10, y * 10, z * 10);
-        return prevHeight + falloff * 0.05 + volcanoFactor * volcanoNoise * 0.1;
+        return (
+          prevHeight +
+          falloff * 0.05 +
+          volcanoFactor * volcanoNoise * 0.1
+        );
       }
       case 'transform':
         return prevHeight + falloff * 0.02;

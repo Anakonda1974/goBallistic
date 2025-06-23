@@ -1,4 +1,5 @@
 import FastNoiseLite from 'fastnoise-lite';
+import * as THREE from 'three';
 import HeightmapStack, { FBMModifier, DomainWarpModifier } from './HeightmapStack.js';
 import PlateTectonics from './PlateTectonics.js';
 import PlateModifier from './PlateModifier.js';
@@ -72,17 +73,47 @@ export default class LayerPipeline {
 
   computeSlope(x, y, z, eps = 0.002) {
 
-    // Sample the fully modified terrain so rocky areas align with the final
-    // elevation. Use central differences for a more stable gradient.
-    const hx1 = this.computeElevation(x + eps, y, z);
-    const hx2 = this.computeElevation(x - eps, y, z);
-    const hy1 = this.computeElevation(x, y + eps, z);
-    const hy2 = this.computeElevation(x, y - eps, z);
-    const hz1 = this.computeElevation(x, y, z + eps);
-    const hz2 = this.computeElevation(x, y, z - eps);
-    const dx = (hx1 - hx2) / (2 * eps);
-    const dy = (hy1 - hy2) / (2 * eps);
-    const dz = (hz1 - hz2) / (2 * eps);
+    // Retrieve boundary information once and reuse it for nearby samples.
+    const info = this.plates.getBoundaryInfo(
+      new THREE.Vector3(x, y, z),
+      this.plateModifier.boundaryRadius
+    );
+
+    const center = this.plateModifier.applyWithInfo(
+      info,
+      x,
+      y,
+      z,
+      this.baseStack.getHeight(x, y, z)
+    );
+
+    // Use forward differences to reduce noise evaluations while maintaining
+    // a stable slope approximation.
+    const hx = this.plateModifier.applyWithInfo(
+      info,
+      x + eps,
+      y,
+      z,
+      this.baseStack.getHeight(x + eps, y, z)
+    );
+    const hy = this.plateModifier.applyWithInfo(
+      info,
+      x,
+      y + eps,
+      z,
+      this.baseStack.getHeight(x, y + eps, z)
+    );
+    const hz = this.plateModifier.applyWithInfo(
+      info,
+      x,
+      y,
+      z + eps,
+      this.baseStack.getHeight(x, y, z + eps)
+    );
+
+    const dx = (hx - center) / eps;
+    const dy = (hy - center) / eps;
+    const dz = (hz - center) / eps;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 
   }
