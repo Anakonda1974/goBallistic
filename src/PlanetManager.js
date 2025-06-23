@@ -58,7 +58,7 @@ export default class PlanetManager {
 
     this.water = new THREE.Mesh(
       new THREE.SphereGeometry(radius * 0.99, 32, 32),
-      createWaterMaterial()
+      createWaterMaterial({ envMap: scene.environment || null })
     );
     scene.add(this.water);
 
