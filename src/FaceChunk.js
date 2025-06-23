@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
 
-import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
-
 
 export default class FaceChunk {
   constructor(face, builder, resolution = 16) {
