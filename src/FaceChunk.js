@@ -11,6 +11,7 @@ export default class FaceChunk {
     this.level = 0;
     this.mesh = null;
     this.children = [];
+    this.rebuilding = false;
 
     // Pre-compute a simple bounding sphere for frustum checks
     this.center = new THREE.Vector3();
@@ -53,7 +54,7 @@ export default class FaceChunk {
     if (targetLevel !== this.level) {
       this.level = targetLevel;
       this.resolution = this.baseResolution * Math.pow(2, this.level);
-      this.rebuild();
+      this.rebuildAsync();
     }
 
 
@@ -64,10 +65,31 @@ export default class FaceChunk {
   }
 
   rebuild() {
-    if (!this.mesh) return;
-    const newGeom = this.builder.buildFace(this.face, this.resolution);
-    this.mesh.geometry.dispose();
-    this.mesh.geometry = newGeom;
+    if (!this.mesh || this.rebuilding) return;
+    this.rebuilding = true;
+    try {
+      const newGeom = this.builder.buildFace(this.face, this.resolution);
+      this.mesh.geometry.dispose();
+      this.mesh.geometry = newGeom;
+    } finally {
+      this.rebuilding = false;
+    }
+  }
+
+  async rebuildAsync(progressCallback) {
+    if (!this.mesh || this.rebuilding) return;
+    this.rebuilding = true;
+    try {
+      const newGeom = await this.builder.buildFaceAsync(
+        this.face,
+        this.resolution,
+        progressCallback
+      );
+      this.mesh.geometry.dispose();
+      this.mesh.geometry = newGeom;
+    } finally {
+      this.rebuilding = false;
+    }
   }
 
   async rebuildAsync(progressCallback) {
