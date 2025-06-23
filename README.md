@@ -24,7 +24,7 @@ npm test
 
 ## Documentation
 
-See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots).
+See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md).
 
 ## Terrain Layers
 
@@ -36,7 +36,8 @@ for realistic geometry. The main layers are:
 2. **tectonics** – displaces terrain near plate boundaries to form trenches and ridges.
 3. **elevation** – merges the previous layers and clamps the result to prevent
    extreme spikes or pits.
-4. **moisture/temperature** – additional noise used for biome selection.
+4. **rocky** – amplifies heights on steep slopes using the cliff controls.
+5. **moisture/temperature** – additional noise used for biome selection.
 
 Adjusting these layers in the UI or code allows experimentation while keeping
 terrain generation stable.

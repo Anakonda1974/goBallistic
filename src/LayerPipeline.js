@@ -27,6 +27,8 @@ export default class LayerPipeline {
     this.baseStack.add(this.domainWarp);
     this.baseStack.add(this.fbm);
 
+    this.cliffParams = { threshold: 0.3, boost: 2.0 };
+
     // tectonics
     this.plates = new PlateTectonics(seed, 20, 0.1);
     this.plateModifier = new PlateModifier(this.plates, 0.05);
@@ -57,6 +59,36 @@ export default class LayerPipeline {
     this.addLayer('vegetation', (x, y, z, ctx) => (ctx.moisture ?? 0) * 0.5 + 0.5);
     this.addLayer('cloudDensity', (x, y, z, ctx) => (ctx.moisture ?? 0) * (1 - Math.abs(ctx.temperature ?? 0)));
     this.addLayer('cloudFlow', (x, y, z) => ({ x: fnl.GetNoise(x, 0, 0), y: 0, z: fnl.GetNoise(0, 0, z) }));
+    this.addLayer('rocky', (x, y, z, ctx) => {
+      const h = ctx.elevation ?? 0;
+      const slope = this.computeSlope(x, y, z);
+      if (slope > this.cliffParams.threshold) {
+        const boosted = h * this.cliffParams.boost;
+        return Math.max(-1, Math.min(1, boosted));
+      }
+      return h;
+    });
+  }
+
+  computeSlope(x, y, z, eps = 0.002) {
+    // Sample the fully modified terrain so rocky areas align with the final
+    // elevation. Use central differences for a more stable gradient.
+    const hx1 = this.computeElevation(x + eps, y, z);
+    const hx2 = this.computeElevation(x - eps, y, z);
+    const hy1 = this.computeElevation(x, y + eps, z);
+    const hy2 = this.computeElevation(x, y - eps, z);
+    const hz1 = this.computeElevation(x, y, z + eps);
+    const hz2 = this.computeElevation(x, y, z - eps);
+    const dx = (hx1 - hx2) / (2 * eps);
+    const dy = (hy1 - hy2) / (2 * eps);
+    const dz = (hz1 - hz2) / (2 * eps);
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  computeElevation(x, y, z) {
+    const base = this.baseStack.getHeight(x, y, z);
+    const tect = this.plateModifier.apply(x, y, z, base);
+    return Math.max(-1, Math.min(1, tect));
   }
 
   addLayer(id, fn, enabled = true) {
@@ -75,6 +107,11 @@ export default class LayerPipeline {
     if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
   }
 
+  setCliffParams({ threshold, boost }) {
+    if (threshold !== undefined) this.cliffParams.threshold = threshold;
+    if (boost !== undefined) this.cliffParams.boost = boost;
+  }
+
   compute(x, y, z) {
     const context = {};
     for (const layer of this.layers) {
@@ -87,6 +124,6 @@ export default class LayerPipeline {
 
   getHeight(x, y, z) {
     const ctx = this.compute(x, y, z);
-    return ctx.elevation ?? 0;
+    return ctx.rocky ?? ctx.elevation ?? 0;
   }
 }
