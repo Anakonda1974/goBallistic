@@ -22,7 +22,9 @@ const grid = new THREE.GridHelper(4, 4);
 scene.add(axes);
 scene.add(grid);
 
-const planet = new PlanetManager(scene, 1, true, true, renderer);
+// Use CPU-based height generation by default so all layers work
+// Set the third argument to `true` to enable GPU compute shaders
+const planet = new PlanetManager(scene, 1, false, true, renderer);
 
 const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
