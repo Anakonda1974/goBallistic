@@ -27,3 +27,6 @@ const heights2 = coords.map(([x, y, z]) => stack2.getHeight(x, y, z));
 
 assert.deepStrictEqual(heights1, heights2);
 console.log('Deterministic heightmap test passed.');
+
+// Run frustum utils test
+import './frustumUtils.js';
