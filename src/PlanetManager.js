@@ -13,6 +13,9 @@ import { getCameraFrustum } from './utils/BoundingUtils.js';
 export default class PlanetManager {
   constructor(scene, radius = 1, useGPU = true, useWorker = false, renderer = null) {
     this.scene = scene;
+    this.group = new THREE.Group();
+    this.scale = 1;
+    scene.add(this.group);
     this.useGPU = useGPU;
     this.useWorker = useWorker;
     this.renderer = renderer;
@@ -49,21 +52,21 @@ export default class PlanetManager {
     for (const face of faces) {
       const chunk = new FaceChunk(face, this.builder, 32, this.useWorker);
       chunk.createMesh(this.terrainMaterial);
-      chunk.addToScene(scene);
+      chunk.addToScene(this.group);
       this.chunks.push(chunk);
     }
 
-      this.water = new THREE.Mesh(
+    this.water = new THREE.Mesh(
         new THREE.SphereGeometry(radius * 0.99, 32, 32),
         createWaterMaterial({ envMap: scene.environment || null })
       );
-      scene.add(this.water);
+      this.group.add(this.water);
       if (this.debugView) {
-        this.debugView.addToScene(scene);
+        this.debugView.addToScene(this.group);
         this.debugView.group.visible = false;
       }
       if (this.layerView) {
-        this.layerView.addToScene(scene);
+        this.layerView.addToScene(this.group);
         this.layerView.group.visible = false;
       }
       this.showDebug = false;
@@ -154,6 +157,14 @@ export default class PlanetManager {
 
   setDayNightCycleEnabled(enabled) {
     this.enableDayNight = enabled;
+  }
+
+  setScale(scale) {
+    this.scale = scale;
+    this.group.scale.set(scale, scale, scale);
+    for (const chunk of this.chunks) {
+      chunk.setScale(scale);
+    }
   }
 
   update(camera) {

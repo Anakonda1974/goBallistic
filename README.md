@@ -26,6 +26,8 @@ npm test
 
 The demo also includes a basic day/night cycle with the main light orbiting the planet.
 
+Additional controls let you scale the entire planet and toggle on-screen rulers (grid and axes) for reference.
+
 ## Documentation
 
 See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md).

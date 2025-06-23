@@ -27,7 +27,9 @@ export default class FaceChunk {
     }
     this.center.multiplyScalar(this.builder.radius);
     this.radius = this.builder.radius * 1.1; // allow some slack for terrain height
-  }
+    this.baseCenter = this.center.clone();
+    this.baseRadius = this.radius;
+    }
 
   getVertexHeight(x, y, z) {
     return this.builder.getVertexHeight(x, y, z);
@@ -76,6 +78,11 @@ export default class FaceChunk {
     } finally {
       this.rebuilding = false;
     }
+  }
+
+  setScale(scale) {
+    this.center.copy(this.baseCenter).multiplyScalar(scale);
+    this.radius = this.baseRadius * scale;
   }
 
   async rebuildAsync(progressCallback) {
