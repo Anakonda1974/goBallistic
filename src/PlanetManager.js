@@ -79,7 +79,14 @@ export default class PlanetManager {
     this.lightAngle = 0;
   }
 
-  setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
+  setNoiseParams({
+    amplitude,
+    frequency,
+    octaves,
+    warpIntensity,
+    fbmOctaves,
+    worleyOctaves,
+  }) {
     if (this.useGPU) {
       if (amplitude !== undefined) this.terrainMaterial.uniforms.uAmplitude.value = amplitude;
       if (frequency !== undefined) this.terrainMaterial.uniforms.uFrequency.value = frequency;
@@ -87,7 +94,14 @@ export default class PlanetManager {
         this.gpuHeight.setParams({ amplitude, frequency, octaves, warpIntensity });
       }
     } else if (this.pipeline) {
-      this.pipeline.setBaseNoiseParams({ amplitude, frequency, octaves, warpIntensity });
+      this.pipeline.setBaseNoiseParams({
+        amplitude,
+        frequency,
+        octaves,
+        warpIntensity,
+        fbmOctaves,
+        worleyOctaves,
+      });
     }
   }
 

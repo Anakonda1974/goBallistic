@@ -36,6 +36,7 @@
     #ui details { margin-bottom: 8px; }
     #ui details[open] > summary { margin-bottom: 4px; }
     #ui .actions { display: flex; gap: 6px; margin-top: 8px; }
+    #ui .octave { display: flex; gap: 6px; }
     #progress { width: 100%; height: 8px; background: #eee; margin-top: 4px; }
     #progress-bar { height: 100%; width: 0; background: #76c7c0; }
     #status { margin-top: 4px; font-size: 0.9em; }
@@ -46,58 +47,19 @@
   <button id="toggle-ui">☰</button>
 
   <div id="ui" class="open">
-    <h2>Planet Settings</h2>
+    <h2>Terrain Noise</h2>
     <details open>
-      <summary>Noise</summary>
-      <div><label>Amplitude <input id="amp" type="range" min="0" max="2" step="0.01" value="1"></label></div>
-      <div><label>Frequency <input id="freq" type="range" min="0.5" max="4" step="0.1" value="1.2"></label></div>
-      <div><label>Octaves <input id="octaves" type="number" min="1" max="8" value="5"></label></div>
-      <div><label>Warp Intensity <input id="warp" type="range" min="0" max="1" step="0.05" value="0.2"></label></div>
+      <summary>FBM Octaves</summary>
+      <div class="octave"><label>Amp <input id="fbmAmp0" type="range" min="0" max="2" step="0.01" value="1"></label><label>Freq <input id="fbmFreq0" type="range" min="0.5" max="4" step="0.1" value="1"></label></div>
+      <div class="octave"><label>Amp <input id="fbmAmp1" type="range" min="0" max="2" step="0.01" value="0.5"></label><label>Freq <input id="fbmFreq1" type="range" min="0.5" max="4" step="0.1" value="2"></label></div>
+      <div class="octave"><label>Amp <input id="fbmAmp2" type="range" min="0" max="2" step="0.01" value="0.25"></label><label>Freq <input id="fbmFreq2" type="range" min="0.5" max="4" step="0.1" value="4"></label></div>
     </details>
 
     <details open>
-      <summary>Cliffs</summary>
-      <div><label>Cliff Threshold <input id="cliffThreshold" type="range" min="0" max="1" step="0.05" value="0.3"></label></div>
-      <div><label>Cliff Boost <input id="cliffBoost" type="range" min="1" max="4" step="0.1" value="2"></label></div>
-    </details>
-
-    <details open>
-      <summary>General</summary>
-      <div><label><input id="dayNightCheck" type="checkbox" checked> Day/Night Cycle</label></div>
-      <div><label>Scale <input id="scale" type="range" min="0.5" max="3" step="0.1" value="1"></label></div>
-      <div><label><input id="rulerCheck" type="checkbox" checked> Show Rulers</label></div>
-    </details>
-
-    <details open>
-      <summary>Layers</summary>
-      <div><label><input id="baseNoiseCheck" type="checkbox" checked> baseNoise</label></div>
-      <div><label><input id="tectonicsCheck" type="checkbox" checked> tectonics</label></div>
-      <div><label><input id="moistureCheck" type="checkbox" checked> moisture</label></div>
-      <div><label><input id="temperatureCheck" type="checkbox" checked> temperature</label></div>
-      <div><label><input id="biomeCheck" type="checkbox" checked> biome</label></div>
-      <div><label><input id="vegetationCheck" type="checkbox" checked> vegetation</label></div>
-      <div><label><input id="cloudDensityCheck" type="checkbox" checked> cloudDensity</label></div>
-      <div><label><input id="cloudFlowCheck" type="checkbox" checked> cloudFlow</label></div>
-      <div><label><input id="rockyCheck" type="checkbox" checked> rocky</label></div>
-    </details>
-
-    <details>
-      <summary>Layer Debug</summary>
-      <div><label><input id="layerDebugCheck" type="checkbox"> Show Debug</label></div>
-      <div>
-        <select id="layerSelect">
-          <option value="baseNoise">baseNoise</option>
-          <option value="tectonics">tectonics</option>
-          <option value="elevation">elevation</option>
-          <option value="moisture">moisture</option>
-          <option value="temperature">temperature</option>
-          <option value="biome">biome</option>
-          <option value="vegetation">vegetation</option>
-          <option value="cloudDensity">cloudDensity</option>
-          <option value="cloudFlow">cloudFlow</option>
-          <option value="rocky">rocky</option>
-        </select>
-      </div>
+      <summary>Worley Octaves</summary>
+      <div class="octave"><label>Amp <input id="worleyAmp0" type="range" min="0" max="2" step="0.01" value="0"></label><label>Freq <input id="worleyFreq0" type="range" min="0.5" max="4" step="0.1" value="1"></label></div>
+      <div class="octave"><label>Amp <input id="worleyAmp1" type="range" min="0" max="2" step="0.01" value="0"></label><label>Freq <input id="worleyFreq1" type="range" min="0.5" max="4" step="0.1" value="2"></label></div>
+      <div class="octave"><label>Amp <input id="worleyAmp2" type="range" min="0" max="2" step="0.01" value="0"></label><label>Freq <input id="worleyFreq2" type="range" min="0.5" max="4" step="0.1" value="4"></label></div>
     </details>
 
     <div class="actions">
