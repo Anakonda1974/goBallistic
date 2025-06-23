@@ -11,9 +11,10 @@ import PlateModifier from './PlateModifier.js';
 import { getCameraFrustum } from './utils/BoundingUtils.js';
 
 export default class PlanetManager {
-  constructor(scene, radius = 1, useGPU = true) {
+  constructor(scene, radius = 1, useGPU = true, useWorker = false) {
     this.scene = scene;
     this.useGPU = useGPU;
+    this.useWorker = useWorker;
 
     const seed = 1234;
     this.seed = seed;
@@ -57,7 +58,7 @@ export default class PlanetManager {
 
     const faces = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
     for (const face of faces) {
-      const chunk = new FaceChunk(face, this.builder, 32);
+      const chunk = new FaceChunk(face, this.builder, 32, this.useWorker);
       chunk.createMesh(this.terrainMaterial);
       chunk.addToScene(scene);
       this.chunks.push(chunk);
