@@ -33,7 +33,7 @@ export default class GeometryBuilder {
 
   buildFaceGPU(face, resolution = 16) {
     if (!this.heightStack.generate) return this.buildFace(face, resolution);
-    const data = this.heightStack.generate(faceIndex(face), 1.0, 1.0, 0.0);
+    const data = this.heightStack.generate(faceIndex(face));
     const vertices = [];
     const indices = [];
     for (let y = 0; y <= resolution; y++) {

@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js';
+import FastNoiseLite from 'fastnoise-lite';
 
-// Simple GPU height generator using GPUComputationRenderer. This is a placeholder
-// implementation that computes FBM noise on the GPU. The shader currently
-// mirrors the CPU pipeline only partially.
+// GPU height generator backed by GPUComputationRenderer when a WebGL
+// renderer is available. In non-browser tests it falls back to a CPU
+// implementation using FastNoiseLite so results remain deterministic.
 
 const noiseShader = `
 vec3 mod289(vec3 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -102,40 +103,115 @@ void main(){
   vec3 cube = cubeFaceVector(uFace, u, v);
   vec3 sphere = cubeToSphere(cube);
   float n = fbm(sphere * uFrequency + uSeed);
-  gl_FragColor = vec4(n * uAmplitude, 0.0, 0.0, 1.0);
+gl_FragColor = vec4(n * uAmplitude, 0.0, 0.0, 1.0);
 }
 `;
 
+function faceName(idx) {
+  switch (idx) {
+    case 0: return 'px';
+    case 1: return 'nx';
+    case 2: return 'py';
+    case 3: return 'ny';
+    case 4: return 'pz';
+    case 5: return 'nz';
+    default: return 'px';
+  }
+}
+
+function cubeFaceVector(face, u, v) {
+  switch (face) {
+    case 'px': return new THREE.Vector3(1, v, -u);
+    case 'nx': return new THREE.Vector3(-1, v, u);
+    case 'py': return new THREE.Vector3(u, 1, -v);
+    case 'ny': return new THREE.Vector3(u, -1, v);
+    case 'pz': return new THREE.Vector3(u, v, 1);
+    case 'nz': return new THREE.Vector3(-u, v, -1);
+    default: return new THREE.Vector3(u, v, 1);
+  }
+}
+
 export default class GPUHeightGenerator {
-  constructor(renderer, size = 33) {
+  constructor(renderer = null, size = 33, seed = 1234) {
     this.renderer = renderer;
     this.size = size;
-    this.gpu = new GPUComputationRenderer(size, size, renderer);
-    const dt = this.gpu.createTexture();
-    this.variable = this.gpu.addVariable('heightTex', computeFragment, dt);
-    this.variable.material.uniforms.uFrequency = { value: 1.0 };
-    this.variable.material.uniforms.uAmplitude = { value: 1.0 };
-    this.variable.material.uniforms.uSeed = { value: 0.0 };
-    this.variable.material.uniforms.uFace = { value: 0 };
-    this.gpu.setVariableDependencies(this.variable, [this.variable]);
-    const err = this.gpu.init();
-    if (err) console.error(err);
+
+    this.noise = new FastNoiseLite(seed);
+    this.noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+
+    this.params = {
+      amplitude: 1.0,
+      frequency: 1.2,
+      octaves: 5,
+      warpIntensity: 0.2,
+    };
+
+    if (renderer) {
+      this.gpu = new GPUComputationRenderer(size, size, renderer);
+      const dt = this.gpu.createTexture();
+      this.variable = this.gpu.addVariable('heightTex', computeFragment, dt);
+      this.variable.material.uniforms.uFrequency = { value: 1.0 };
+      this.variable.material.uniforms.uAmplitude = { value: 1.0 };
+      this.variable.material.uniforms.uSeed = { value: 0.0 };
+      this.variable.material.uniforms.uFace = { value: 0 };
+      this.gpu.setVariableDependencies(this.variable, [this.variable]);
+      const err = this.gpu.init();
+      if (err) console.error(err);
+    }
   }
 
-  generate(face, freq, amp, seed){
-    this.variable.material.uniforms.uFace.value = face;
-    this.variable.material.uniforms.uFrequency.value = freq;
-    this.variable.material.uniforms.uAmplitude.value = amp;
-    this.variable.material.uniforms.uSeed.value = seed;
-    this.gpu.compute();
-    const target = this.gpu.getCurrentRenderTarget(this.variable);
+  setParams({ amplitude, frequency, octaves, warpIntensity }) {
+    if (amplitude !== undefined) this.params.amplitude = amplitude;
+    if (frequency !== undefined) this.params.frequency = frequency;
+    if (octaves !== undefined) this.params.octaves = octaves;
+    if (warpIntensity !== undefined) this.params.warpIntensity = warpIntensity;
+  }
+
+  generate(face, freq = this.params.frequency, amp = this.params.amplitude, seed = 0) {
+    // If a renderer is present use the GPU path, otherwise fall back to CPU
+    if (this.renderer && this.gpu) {
+      this.variable.material.uniforms.uFace.value = face;
+      this.variable.material.uniforms.uFrequency.value = freq;
+      this.variable.material.uniforms.uAmplitude.value = amp;
+      this.variable.material.uniforms.uSeed.value = seed;
+      this.gpu.compute();
+      const target = this.gpu.getCurrentRenderTarget(this.variable);
+      const buffer = new Float32Array(this.size * this.size * 4);
+      this.renderer.readRenderTargetPixels(target, 0, 0, this.size, this.size, buffer);
+      return buffer;
+    }
+
     const buffer = new Float32Array(this.size * this.size * 4);
-    this.renderer.readRenderTargetPixels(target, 0,0,this.size,this.size, buffer);
+    for (let y = 0; y < this.size; y++) {
+      for (let x = 0; x < this.size; x++) {
+        const u = (x / (this.size - 1)) * 2 - 1;
+        const v = (y / (this.size - 1)) * 2 - 1;
+        const cube = cubeFaceVector(faceName(face), u, v);
+        const sphere = cubeToSphere(cube);
+        const h = this.getHeight(
+          sphere.x * freq + seed,
+          sphere.y * freq + seed,
+          sphere.z * freq + seed
+        ) * amp;
+        buffer[(y * this.size + x) * 4] = h;
+      }
+    }
     return buffer;
   }
 
   getHeight(x, y, z) {
-    // Placeholder for parity with HeightmapStack API
-    return 0;
+    const warp = this.noise.GetNoise(x, y, z) * this.params.warpIntensity;
+    let wx = x + warp;
+    let wy = y + warp;
+    let wz = z + warp;
+    let freq = this.params.frequency;
+    let amp = this.params.amplitude;
+    let value = 0;
+    for (let i = 0; i < this.params.octaves; i++) {
+      value += this.noise.GetNoise(wx * freq, wy * freq, wz * freq) * amp;
+      freq *= 2;
+      amp *= 0.5;
+    }
+    return Math.max(-1, Math.min(1, value));
   }
 }
