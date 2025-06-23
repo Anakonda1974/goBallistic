@@ -92,18 +92,22 @@ export default class PlanetManager {
       }
     };
 
-    if (statusCallback) statusCallback('Starting rebuild');
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
 
     for (let i = 0; i < total; i++) {
       const chunk = this.chunks[i];
-      if (statusCallback) statusCallback(`Building ${chunk.face}`);
-      await chunk.rebuildAsync((p) => update(i, p));
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: i / total });
+      await chunk.rebuildAsync((p) => {
+        update(i, p);
+        if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: (i + p) / total });
+      });
       update(i, 1);
-      if (statusCallback) statusCallback(`Finished ${chunk.face}`);
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: (i + 1) / total });
       await new Promise((r) => requestAnimationFrame(r));
     }
 
-    if (statusCallback) statusCallback('Rebuild complete');
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+
   }
 
   setDebugVisible(visible) {
