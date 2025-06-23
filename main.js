@@ -18,6 +18,7 @@ camera.position.set(0, 3, 6);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 const planet = new PlanetManager(scene, 1, true, true);
+planet.setDayNightCycleEnabled(true);
 
 const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
@@ -36,6 +37,7 @@ const cloudFlowCheck = document.getElementById('cloudFlowCheck');
 const rockyCheck = document.getElementById('rockyCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
+const statusDiv = document.getElementById('status');
 
 function updateParams() {
   planet.setNoiseParams({
@@ -65,9 +67,20 @@ async function triggerRebuild() {
   rebuilding = true;
   updateParams();
   progressBar.style.width = '0%';
-  await planet.rebuild(p => {
-    progressBar.style.width = `${p * 100}%`;
-  });
+  statusDiv.textContent = 'Rebuild -> starting';
+
+  await planet.rebuild(
+    p => {
+      progressBar.style.width = `${p * 100}%`;
+    },
+
+    ({ task, subtask, progress }) => {
+      const pct = Math.round(progress * 100);
+      statusDiv.textContent = `${task} -> ${subtask} (${pct}%)`;
+
+    }
+  );
+  statusDiv.textContent = 'Idle';
   rebuilding = false;
 }
 

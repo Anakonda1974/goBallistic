@@ -71,6 +71,7 @@ export default class LayerPipeline {
   }
 
   computeSlope(x, y, z, eps = 0.002) {
+
     // Sample the fully modified terrain so rocky areas align with the final
     // elevation. Use central differences for a more stable gradient.
     const hx1 = this.computeElevation(x + eps, y, z);
@@ -83,12 +84,14 @@ export default class LayerPipeline {
     const dy = (hy1 - hy2) / (2 * eps);
     const dz = (hz1 - hz2) / (2 * eps);
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+
   }
 
   computeElevation(x, y, z) {
     const base = this.baseStack.getHeight(x, y, z);
     const tect = this.plateModifier.apply(x, y, z, base);
     return Math.max(-1, Math.min(1, tect));
+
   }
 
   addLayer(id, fn, enabled = true) {

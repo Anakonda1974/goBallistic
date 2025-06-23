@@ -53,10 +53,12 @@ export default class PlanetManager {
       }
       this.showDebug = false;
 
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 5, 5);
-    scene.add(light);
+    this.light = new THREE.DirectionalLight(0xffffff, 1);
+    this.light.position.set(5, 5, 5);
+    scene.add(this.light);
     scene.add(new THREE.AmbientLight(0x333333));
+    this.enableDayNight = false;
+    this.lightAngle = 0;
   }
 
   setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
@@ -78,7 +80,7 @@ export default class PlanetManager {
     if (this.pipeline) this.pipeline.setEnabled(id, enabled);
   }
 
-  async rebuild(progressCallback) {
+  async rebuild(progressCallback, statusCallback) {
     const total = this.chunks.length;
     const progress = new Array(total).fill(0);
 
@@ -90,11 +92,22 @@ export default class PlanetManager {
       }
     };
 
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'starting', progress: 0 });
+
     for (let i = 0; i < total; i++) {
-      await this.chunks[i].rebuildAsync((p) => update(i, p));
+      const chunk = this.chunks[i];
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: i / total });
+      await chunk.rebuildAsync((p) => {
+        update(i, p);
+        if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `building ${chunk.face}`, progress: (i + p) / total });
+      });
       update(i, 1);
+      if (statusCallback) statusCallback({ task: 'Rebuild', subtask: `completed ${chunk.face}`, progress: (i + 1) / total });
       await new Promise((r) => requestAnimationFrame(r));
     }
+
+    if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+
   }
 
   setDebugVisible(visible) {
@@ -104,8 +117,22 @@ export default class PlanetManager {
     }
   }
 
+  setDayNightCycleEnabled(enabled) {
+    this.enableDayNight = enabled;
+  }
+
   update(camera) {
     const frustum = getCameraFrustum(camera);
+    if (this.enableDayNight && this.light) {
+      this.lightAngle += 0.01;
+      const r = 5;
+      this.light.position.set(
+        Math.cos(this.lightAngle) * r,
+        Math.sin(this.lightAngle) * r,
+        5
+      );
+      this.light.lookAt(0, 0, 0);
+    }
     for (const chunk of this.chunks) {
       chunk.update(camera, this.lod, frustum);
     }
