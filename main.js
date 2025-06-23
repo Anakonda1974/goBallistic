@@ -68,13 +68,16 @@ async function triggerRebuild() {
   updateParams();
   progressBar.style.width = '0%';
   statusDiv.textContent = 'Rebuild -> starting';
+
   await planet.rebuild(
     p => {
       progressBar.style.width = `${p * 100}%`;
     },
+
     ({ task, subtask, progress }) => {
       const pct = Math.round(progress * 100);
       statusDiv.textContent = `${task} -> ${subtask} (${pct}%)`;
+
     }
   );
   statusDiv.textContent = 'Idle';

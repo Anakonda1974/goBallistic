@@ -107,6 +107,7 @@ export default class PlanetManager {
     }
 
     if (statusCallback) statusCallback({ task: 'Rebuild', subtask: 'complete', progress: 1 });
+
   }
 
   setDebugVisible(visible) {
