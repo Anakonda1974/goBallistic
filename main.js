@@ -46,6 +46,9 @@ const layerSelect = document.getElementById('layerSelect');
 const scaleInput = document.getElementById('scale');
 const rulerCheck = document.getElementById('rulerCheck');
 const rebuildBtn = document.getElementById('rebuild');
+const resetBtn = document.getElementById('reset');
+const ui = document.getElementById('ui');
+const toggleBtn = document.getElementById('toggle-ui');
 const progressBar = document.getElementById('progress-bar');
 const statusDiv = document.getElementById('status');
 
@@ -82,6 +85,25 @@ function updateParams() {
   grid.visible = show;
 }
 
+function resetParams() {
+  amp.value = 1;
+  freq.value = 1.2;
+  octaves.value = 5;
+  warp.value = 0.2;
+  cliffThreshold.value = 0.3;
+  cliffBoost.value = 2;
+  dayNightCheck.checked = true;
+  scaleInput.value = 1;
+  rulerCheck.checked = true;
+  [baseNoiseCheck, tectonicsCheck, moistureCheck, temperatureCheck,
+    biomeCheck, vegetationCheck, cloudDensityCheck, cloudFlowCheck,
+    rockyCheck].forEach(el => { el.checked = true; });
+  layerDebugCheck.checked = false;
+  layerSelect.value = 'baseNoise';
+  updateParams();
+  triggerRebuild();
+}
+
 let rebuilding = false;
 async function triggerRebuild() {
   if (rebuilding) return;
@@ -106,6 +128,10 @@ async function triggerRebuild() {
 }
 
 rebuildBtn.addEventListener('click', triggerRebuild);
+resetBtn.addEventListener('click', resetParams);
+toggleBtn.addEventListener('click', () => {
+  ui.classList.toggle('open');
+});
 [amp, freq, octaves, warp,
   cliffThreshold, cliffBoost,
   baseNoiseCheck, tectonicsCheck, moistureCheck, temperatureCheck,
