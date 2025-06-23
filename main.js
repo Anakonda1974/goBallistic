@@ -23,6 +23,11 @@ const amp = document.getElementById('amp');
 const freq = document.getElementById('freq');
 const octaves = document.getElementById('octaves');
 const warp = document.getElementById('warp');
+const terraceSteps = document.getElementById('terraceSteps');
+const terraceRange = document.getElementById('terraceRange');
+const domainWarpCheck = document.getElementById('domainWarpCheck');
+const terraceCheck = document.getElementById('terraceCheck');
+const cliffCheck = document.getElementById('cliffCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
 
@@ -31,8 +36,13 @@ function updateParams() {
     amplitude: parseFloat(amp.value),
     frequency: parseFloat(freq.value),
     octaves: parseInt(octaves.value, 10),
-    warpIntensity: parseFloat(warp.value)
+    warpIntensity: parseFloat(warp.value),
+    terraceSteps: parseInt(terraceSteps.value, 10),
+    terraceRange: parseFloat(terraceRange.value)
   });
+  planet.setModifierEnabled('domainWarp', domainWarpCheck.checked);
+  planet.setModifierEnabled('terrace', terraceCheck.checked);
+  planet.setModifierEnabled('cliff', cliffCheck.checked);
 }
 
 let rebuilding = false;
@@ -48,8 +58,14 @@ async function triggerRebuild() {
 }
 
 rebuildBtn.addEventListener('click', triggerRebuild);
-[amp, freq, octaves, warp].forEach(input => {
+[amp, freq, octaves, warp,
+  terraceSteps, terraceRange,
+  domainWarpCheck, terraceCheck, cliffCheck
+].forEach(input => {
   input.addEventListener('input', triggerRebuild);
+  if (input.type === 'checkbox') {
+    input.addEventListener('change', triggerRebuild);
+  }
 });
 
 function animate() {

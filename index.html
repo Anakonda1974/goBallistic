@@ -25,7 +25,22 @@
       <label>Octaves <input id="octaves" type="number" min="1" max="8" value="5"></label>
     </div>
     <div>
-      <label>Warp <input id="warp" type="range" min="0" max="1" step="0.05" value="0.2"></label>
+      <label><input id="domainWarpCheck" type="checkbox" checked> Domain Warp</label>
+    </div>
+    <div>
+      <label>Warp Intensity <input id="warp" type="range" min="0" max="1" step="0.05" value="0.2"></label>
+    </div>
+    <div>
+      <label><input id="terraceCheck" type="checkbox" checked> Terracing</label>
+    </div>
+    <div>
+      <label>Terrace Steps <input id="terraceSteps" type="number" min="1" max="20" value="8"></label>
+    </div>
+    <div>
+      <label>Terrace Range <input id="terraceRange" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+    </div>
+    <div>
+      <label><input id="cliffCheck" type="checkbox"> Cliffs</label>
     </div>
     <button id="rebuild">Rebuild</button>
     <div id="progress"><div id="progress-bar"></div></div>
