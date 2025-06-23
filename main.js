@@ -23,9 +23,10 @@ const grid = new THREE.GridHelper(4, 4);
 scene.add(axes);
 scene.add(grid);
 
-// Use CPU-based height generation by default so all layers work
-// Set the third argument to `true` to enable GPU compute shaders
-const planet = new PlanetManager(scene, 1, false, true, renderer);
+// Use CPU-based height generation and build geometry on the main thread so
+// noise edits immediately affect the mesh. Set the third argument to `true`
+// to enable GPU compute shaders.
+const planet = new PlanetManager(scene, 1, false, false, renderer);
 
 const fbmAmpInputs = [
   document.getElementById('fbmAmp0'),
