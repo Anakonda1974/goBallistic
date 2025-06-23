@@ -49,3 +49,19 @@ for realistic geometry. The main layers are:
 
 Adjusting these layers in the UI or code allows experimentation while keeping
 terrain generation stable.
+
+### Customizing Tectonic Plates
+
+`LayerPipeline` accepts an optional options object to configure plate parameters.
+
+```js
+import LayerPipeline from './src/LayerPipeline.js';
+
+const pipeline = new LayerPipeline(42, {
+  plateCount: 32,
+  boundaryRadius: 0.1,
+  effectRadius: 0.05
+});
+```
+
+See [`docs/TectonicPlates.md`](docs/TectonicPlates.md) for details.
