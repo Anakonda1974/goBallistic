@@ -26,6 +26,17 @@ npm test
 
 The demo also includes a basic day/night cycle with the main light orbiting the planet.
 
+## GPU Height Generation
+
+`PlanetManager` supports computing heights on the GPU when a WebGL renderer is provided. Pass the renderer to the constructor while keeping `useGPU` enabled:
+
+```js
+const renderer = new THREE.WebGLRenderer();
+const planet = new PlanetManager(scene, 1, true, true, renderer);
+```
+
+If no renderer is available (for example in tests) the generator falls back to a deterministic CPU implementation.
+
 ## Documentation
 
 See [`PROJECT.md`](PROJECT.md) for an overview of the architecture and future plans. Modifier screenshots are located in [`docs/screenshots`](docs/screenshots). Details about the rocky layer are in [`docs/RockyLayer.md`](docs/RockyLayer.md).

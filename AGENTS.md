@@ -7,7 +7,7 @@ This file lists outstanding tasks and opportunities for future improvements.
 
 - [ ] Expand project README with setup and usage instructions.
 - [ ] Explore using Web Workers for asynchronous chunk generation.
-- [ ] Implement seeded global Voronoi segmentation for tectonic plates.
+ - [x] **GPU heightmap pipeline** – implemented compute shaders with a CPU fallback so GPU and CPU paths produce consistent results.
 - [ ] Assign each plate a random tangent motion vector.
 - [ ] Classify boundaries as divergent, convergent, or transform.
 - [ ] Modify the heightmap around boundaries to form trenches, ridges, and volcanoes.
