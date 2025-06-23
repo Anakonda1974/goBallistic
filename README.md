@@ -26,16 +26,9 @@ npm test
 
 The demo also includes a basic day/night cycle with the main light orbiting the planet.
 
-## GPU Height Generation
 
-`PlanetManager` supports computing heights on the GPU when a WebGL renderer is provided. Pass the renderer to the constructor while keeping `useGPU` enabled:
+Additional controls let you scale the entire planet and toggle on-screen rulers (grid and axes) for reference.
 
-```js
-const renderer = new THREE.WebGLRenderer();
-const planet = new PlanetManager(scene, 1, true, true, renderer);
-```
-
-If no renderer is available (for example in tests) the generator falls back to a deterministic CPU implementation.
 
 ## Documentation
 

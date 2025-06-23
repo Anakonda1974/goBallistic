@@ -17,6 +17,11 @@ camera.position.set(0, 3, 6);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+const axes = new THREE.AxesHelper(2);
+const grid = new THREE.GridHelper(4, 4);
+scene.add(axes);
+scene.add(grid);
+
 const planet = new PlanetManager(scene, 1, true, true, renderer);
 
 const amp = document.getElementById('amp');
@@ -38,9 +43,15 @@ const cloudFlowCheck = document.getElementById('cloudFlowCheck');
 const rockyCheck = document.getElementById('rockyCheck');
 const layerDebugCheck = document.getElementById('layerDebugCheck');
 const layerSelect = document.getElementById('layerSelect');
+const scaleInput = document.getElementById('scale');
+const rulerCheck = document.getElementById('rulerCheck');
 const rebuildBtn = document.getElementById('rebuild');
 const progressBar = document.getElementById('progress-bar');
 const statusDiv = document.getElementById('status');
+
+axes.visible = rulerCheck.checked;
+grid.visible = rulerCheck.checked;
+planet.setScale(parseFloat(scaleInput.value));
 
 function updateParams() {
   planet.setNoiseParams({
@@ -65,6 +76,10 @@ function updateParams() {
   planet.setDebugVisible(layerDebugCheck.checked);
   planet.setDebugLayer(layerSelect.value);
   planet.setDayNightCycleEnabled(dayNightCheck.checked);
+  planet.setScale(parseFloat(scaleInput.value));
+  const show = rulerCheck.checked;
+  axes.visible = show;
+  grid.visible = show;
 }
 
 let rebuilding = false;
@@ -103,6 +118,13 @@ rebuildBtn.addEventListener('click', triggerRebuild);
   }
   if (input.tagName === 'SELECT') {
     input.addEventListener('change', triggerRebuild);
+  }
+});
+
+[scaleInput, rulerCheck].forEach(input => {
+  input.addEventListener('input', updateParams);
+  if (input.type === 'checkbox') {
+    input.addEventListener('change', updateParams);
   }
 });
 
