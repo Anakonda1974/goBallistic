@@ -19,10 +19,15 @@ export default class PlanetManager {
     this.heightStack = new HeightmapStack(seed);
     this.domainWarp = new DomainWarpModifier(fnl, 0.2);
     this.fbm = new FBMModifier(fnl, 1.0, 1.2, 5);
-    this.heightStack.add(this.domainWarp);
-    this.heightStack.add(this.fbm);
-    this.heightStack.add(new TerraceModifier(8, 0.8));
-    // this.heightStack.add(new CliffModifier(0.25, 2.2));
+    this.terrace = new TerraceModifier(8, 0.8);
+    this.cliff = new CliffModifier(0.25, 2.2);
+
+    this.modifiers = [this.domainWarp, this.fbm, this.terrace];
+    for (const m of this.modifiers) this.heightStack.add(m);
+
+    this.useDomainWarp = true;
+    this.useTerrace = true;
+    this.useCliff = false;
 
     this.builder = new GeometryBuilder(this.heightStack, radius);
     this.lod = new ChunkLODController();
@@ -48,11 +53,53 @@ export default class PlanetManager {
     scene.add(new THREE.AmbientLight(0x333333));
   }
 
-  setNoiseParams({ amplitude, frequency, octaves, warpIntensity }) {
+  setNoiseParams({
+    amplitude,
+    frequency,
+    octaves,
+    warpIntensity,
+    terraceSteps,
+    terraceRange,
+  }) {
     if (amplitude !== undefined) this.fbm.amplitude = amplitude;
     if (frequency !== undefined) this.fbm.frequency = frequency;
     if (octaves !== undefined) this.fbm.octaves = octaves;
     if (warpIntensity !== undefined) this.domainWarp.intensity = warpIntensity;
+    if (terraceSteps !== undefined) this.terrace.steps = terraceSteps;
+    if (terraceRange !== undefined) this.terrace.heightRange = terraceRange;
+  }
+
+  setModifierEnabled(name, enabled) {
+    switch (name) {
+      case 'domainWarp':
+        this.useDomainWarp = enabled;
+        this._toggleModifier(this.domainWarp, enabled);
+        break;
+      case 'terrace':
+        this.useTerrace = enabled;
+        this._toggleModifier(this.terrace, enabled);
+        break;
+      case 'cliff':
+        this.useCliff = enabled;
+        this._toggleModifier(this.cliff, enabled);
+        break;
+    }
+  }
+
+  _toggleModifier(mod, enabled) {
+    const hasMod = this.heightStack.modifiers.includes(mod);
+    if (enabled && !hasMod) {
+      this.heightStack.modifiers.push(mod);
+    } else if (!enabled && hasMod) {
+      this.heightStack.modifiers = this.heightStack.modifiers.filter(m => m !== mod);
+    }
+    // Re-order modifiers to maintain consistent stack
+    const ordered = [];
+    if (this.useDomainWarp && ordered.indexOf(this.domainWarp) === -1) ordered.push(this.domainWarp);
+    ordered.push(this.fbm);
+    if (this.useTerrace && ordered.indexOf(this.terrace) === -1) ordered.push(this.terrace);
+    if (this.useCliff && ordered.indexOf(this.cliff) === -1) ordered.push(this.cliff);
+    this.heightStack.modifiers = ordered;
   }
 
   async rebuild(progressCallback) {
