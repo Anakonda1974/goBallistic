@@ -122,10 +122,11 @@ export default class PlanetManager {
     }
     // Re-order modifiers to maintain consistent stack
     const ordered = [];
-    if (this.useDomainWarp && ordered.indexOf(this.domainWarp) === -1) ordered.push(this.domainWarp);
+    if (this.useDomainWarp) ordered.push(this.domainWarp);
     ordered.push(this.fbm);
-    if (this.useTerrace && ordered.indexOf(this.terrace) === -1) ordered.push(this.terrace);
-    if (this.useCliff && ordered.indexOf(this.cliff) === -1) ordered.push(this.cliff);
+    if (this.useTerrace) ordered.push(this.terrace);
+    if (this.useCliff) ordered.push(this.cliff);
+    ordered.push(this.plateModifier);
     this.heightStack.modifiers = ordered;
   }
 

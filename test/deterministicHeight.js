@@ -30,3 +30,4 @@ console.log('Deterministic heightmap test passed.');
 
 // Run frustum utils test
 import './frustumUtils.js';
+import './plateTectonics.js';
