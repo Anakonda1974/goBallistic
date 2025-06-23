@@ -3,7 +3,7 @@ import { sphereIntersectsFrustum } from './utils/BoundingUtils.js';
 
 
 export default class FaceChunk {
-  constructor(face, builder, resolution = 16) {
+  constructor(face, builder, resolution = 16, useWorker = false) {
     this.face = face;
     this.builder = builder;
     this.baseResolution = resolution;
@@ -12,6 +12,8 @@ export default class FaceChunk {
     this.mesh = null;
     this.children = [];
     this.rebuilding = false;
+    this.useWorker = useWorker;
+    this.worker = null;
 
     // Pre-compute a simple bounding sphere for frustum checks
     this.center = new THREE.Vector3();
@@ -80,13 +82,33 @@ export default class FaceChunk {
     if (!this.mesh || this.rebuilding) return;
     this.rebuilding = true;
     try {
-      const newGeom = await this.builder.buildFaceAsync(
-        this.face,
-        this.resolution,
-        progressCallback
-      );
+      let geometry;
+      if (this.useWorker && typeof Worker !== 'undefined') {
+        if (!this.worker) {
+          this.worker = new Worker(new URL('./workers/geometryWorker.js', import.meta.url), { type: 'module' });
+        }
+        const data = await new Promise((resolve) => {
+          this.worker.onmessage = (e) => resolve(e.data);
+          this.worker.postMessage({
+            face: this.face,
+            resolution: this.resolution,
+            radius: this.builder.radius,
+            seed: this.builder.heightStack.seed || 0
+          });
+        });
+        geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(data.position, 3));
+        geometry.setIndex(Array.from(data.index));
+        geometry.computeVertexNormals();
+      } else {
+        geometry = await this.builder.buildFaceAsync(
+          this.face,
+          this.resolution,
+          progressCallback
+        );
+      }
       this.mesh.geometry.dispose();
-      this.mesh.geometry = newGeom;
+      this.mesh.geometry = geometry;
     } finally {
       this.rebuilding = false;
     }
