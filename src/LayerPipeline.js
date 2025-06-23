@@ -13,8 +13,13 @@ export class Layer {
 }
 
 export default class LayerPipeline {
-  constructor(seed = 0) {
+  constructor(seed = 0, options = {}) {
     this.seed = seed;
+    const {
+      plateCount = 20,
+      boundaryRadius = 0.1,
+      effectRadius = 0.05
+    } = options;
     this.layers = [];
     this.enabled = new Map();
 
@@ -31,8 +36,8 @@ export default class LayerPipeline {
     this.cliffParams = { threshold: 0.3, boost: 2.0 };
 
     // tectonics
-    this.plates = new PlateTectonics(seed, 20, 0.1);
-    this.plateModifier = new PlateModifier(this.plates, 0.05);
+    this.plates = new PlateTectonics(seed, plateCount, boundaryRadius);
+    this.plateModifier = new PlateModifier(this.plates, effectRadius);
 
     this.addLayer('baseNoise', (x, y, z, ctx) => this.baseStack.getHeight(x, y, z));
     this.addLayer('tectonics', (x, y, z, ctx) => this.plateModifier.apply(x, y, z, ctx.baseNoise || 0));
