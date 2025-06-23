@@ -48,6 +48,8 @@ const worleyFreqInputs = [
   document.getElementById('worleyFreq1'),
   document.getElementById('worleyFreq2'),
 ];
+const cliffThreshInput = document.getElementById('cliffThresh');
+const cliffBoostInput = document.getElementById('cliffBoost');
 const rebuildBtn = document.getElementById('rebuild');
 const resetBtn = document.getElementById('reset');
 const ui = document.getElementById('ui');
@@ -74,6 +76,10 @@ function updateParams() {
     fbmOctaves: buildOctaves(fbmAmpInputs, fbmFreqInputs),
     worleyOctaves: buildOctaves(worleyAmpInputs, worleyFreqInputs),
   });
+  planet.setCliffParams({
+    threshold: parseFloat(cliffThreshInput.value),
+    boost: parseFloat(cliffBoostInput.value),
+  });
 }
 
 function resetParams() {
@@ -95,6 +101,8 @@ function resetParams() {
     worleyAmpInputs[i].value = o.amp;
     worleyFreqInputs[i].value = o.freq;
   });
+  cliffThreshInput.value = 0.3;
+  cliffBoostInput.value = 2;
   updateParams();
   triggerRebuild();
 }
@@ -127,11 +135,16 @@ resetBtn.addEventListener('click', resetParams);
 toggleBtn.addEventListener('click', () => {
   ui.classList.toggle('open');
 });
-[...fbmAmpInputs, ...fbmFreqInputs, ...worleyAmpInputs, ...worleyFreqInputs].forEach(
-  input => {
-    input.addEventListener('input', triggerRebuild);
-  }
-);
+[
+  ...fbmAmpInputs,
+  ...fbmFreqInputs,
+  ...worleyAmpInputs,
+  ...worleyFreqInputs,
+  cliffThreshInput,
+  cliffBoostInput,
+].forEach(input => {
+  input.addEventListener('input', triggerRebuild);
+});
 
 function animate() {
   requestAnimationFrame(animate);
